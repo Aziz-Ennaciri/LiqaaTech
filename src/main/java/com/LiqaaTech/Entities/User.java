@@ -1,5 +1,6 @@
 package com.LiqaaTech.Entities;
 
+import com.LiqaaTech.Enums.Role;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,6 +21,9 @@ public class User extends EntityBase {
 
     @Column(nullable = false)
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     private boolean enabled = true;
 
