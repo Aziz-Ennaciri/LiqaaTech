@@ -11,6 +11,8 @@ import java.util.List;
 public class EventMapper {
     @Autowired
     private RegistrationMapper RegistrationMapper;
+    @Autowired
+    private UserMapper UserMapper;
 
 
     public EventDTO toDTO(Event event) {
@@ -22,6 +24,7 @@ public class EventMapper {
         eventDTO.setImageUrl(event.getImageUrl());
         eventDTO.setPublic(event.isPublic());
         eventDTO.setCategory(event.getCategory());
+        eventDTO.setOrganizerDTO(UserMapper.toDTO(event.getOrganizer()));
         eventDTO.setRegistrationsDTO(RegistrationMapper.toDTOList(event.getRegistrations()));
         return eventDTO;
     }
@@ -34,6 +37,7 @@ public class EventMapper {
         event.setImageUrl(eventDTO.getImageUrl());
         event.setPublic(eventDTO.isPublic());
         event.setCategory(eventDTO.getCategory());
+        event.setOrganizer(UserMapper.toEntity(eventDTO.getOrganizerDTO()));
         event.setRegistrations(RegistrationMapper.toEntityList(eventDTO.getRegistrationsDTO()));
         return event;
     }
