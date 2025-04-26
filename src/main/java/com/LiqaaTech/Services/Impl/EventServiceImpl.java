@@ -4,6 +4,7 @@ import com.LiqaaTech.DTOs.EventDTO;
 import com.LiqaaTech.Entities.Event;
 import com.LiqaaTech.Entities.Registration;
 import com.LiqaaTech.Entities.User;
+import com.LiqaaTech.Exceptions.NotFoundException;
 import com.LiqaaTech.Mappers.EventMapper;
 import com.LiqaaTech.Mappers.RegistrationMapper;
 import com.LiqaaTech.Mappers.UserMapper;
@@ -44,7 +45,26 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventDTO updateEvent(Long eventId, EventDTO eventDTO) {
-        return null;
+        Event savedEvent = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + eventId));
+        savedEvent.setTitle(eventDTO.getTitle());
+        savedEvent.setLocation(eventDTO.getLocation());
+        savedEvent.setDescription(eventDTO.getDescription());
+        savedEvent.setDate(eventDTO.getDate());
+        savedEvent.setImageUrl(eventDTO.getImageUrl());
+        savedEvent.setPublic(eventDTO.isPublic());
+        savedEvent.setCategory(eventDTO.getCategory());
+        if (eventDTO.getOrganizerDTO() != null) {
+            User organizer = userMapper.toEntity(eventDTO.getOrganizerDTO());
+            savedEvent.setOrganizer(organizer);
+        }
+        if (eventDTO.getRegistrationsDTO() != null) {
+            List<Registration> registrations = registrationMapper.toEntityList(eventDTO.getRegistrationsDTO());
+            registrations.forEach(r -> r.setEvent(savedEvent));
+            savedEvent.setRegistrations(registrations);
+        }
+        Event updatedEvent = eventRepository.save(savedEvent);
+        return eventMapper.toDTO(updatedEvent);
     }
 
     @Override
@@ -56,11 +76,17 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventDTO getEventById(Long eventId) {
-        return null;
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + eventId));
+        return eventMapper.toDTO(event);
     }
 
     @Override
     public List<EventDTO> getAllEvents() {
-        return null;
+        List<Event> events = eventRepository.findAll();
+        if(events.isEmpty()){
+            throw new NotFoundException("No Events found");
+        }
+        return eventMapper.toDTOList(events);
     }
 }
