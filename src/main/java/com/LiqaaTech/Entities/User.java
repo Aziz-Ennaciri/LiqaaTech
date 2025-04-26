@@ -24,7 +24,6 @@ public class User extends EntityBase {
 
     @Enumerated(EnumType.STRING)
     private Role role;
-
     private boolean enabled = true;
 
     @OneToMany(mappedBy = "organizer")
