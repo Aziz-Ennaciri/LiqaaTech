@@ -5,6 +5,8 @@ import com.LiqaaTech.Entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class UserMapper {
     @Autowired
@@ -32,4 +34,12 @@ public class UserMapper {
         user.setOrganizedEvents(EventMapper.toEntityList(userDTO.getOrganizedEventsDTO()));
         return user;
     }
+
+    public List<UserDTO> toDTOList(List<User> users) {
+        return users.stream().map(this::toDTO).toList();
+    }
+    public List<User> toEntityList(List<UserDTO> dtos) {
+        return dtos.stream().map(this::toEntity).toList();
+    }
+
 }
