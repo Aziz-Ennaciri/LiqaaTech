@@ -1,0 +1,4 @@
+package com.LiqaaTech.Controllers;
+
+public class RegistrationController {
+}
