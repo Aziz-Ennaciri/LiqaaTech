@@ -2,6 +2,7 @@ package com.LiqaaTech.Services.Impl;
 
 import com.LiqaaTech.DTOs.TicketDTO;
 import com.LiqaaTech.Entities.Ticket;
+import com.LiqaaTech.Mappers.RegistrationMapper;
 import com.LiqaaTech.Mappers.TicketMapper;
 import com.LiqaaTech.Repositories.TicketRepository;
 import com.LiqaaTech.Services.Interf.TicketService;
@@ -16,12 +17,25 @@ public class TicketServiceImpl implements TicketService {
     private TicketRepository ticketRepository;
     @Autowired
     private TicketMapper ticketMapper;
+    @Autowired
+    private RegistrationMapper registrationMapper;
 
     @Override
     public TicketDTO createTicket(TicketDTO ticketDTO) {
         Ticket ticket = ticketMapper.toEntity(ticketDTO);
         Ticket savedTicket = ticketRepository.save(ticket);
         return ticketMapper.toDTO(savedTicket);
+    }
+
+    @Override
+    public TicketDTO updateTicket(Long ticketId, TicketDTO ticketDTO) {
+        Ticket ticket = ticketRepository.findById(ticketId).orElseThrow(() -> new RuntimeException("Ticket not found with id: " + ticketId));
+        ticket.setTicketCode(ticketDTO.getTicketCode());
+        if(ticketDTO.getRegistrationDTO() != null) {
+            ticket.setRegistration(registrationMapper.toEntity(ticketDTO.getRegistrationDTO()));
+        }
+        Ticket updatedTicket = ticketRepository.save(ticket);
+        return ticketMapper.toDTO(updatedTicket);
     }
 
     @Override
