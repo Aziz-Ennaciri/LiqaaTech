@@ -1,19 +1,47 @@
 package com.LiqaaTech.Entities;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @Setter
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "tickets")
+@SQLDelete(sql = "UPDATE tickets SET deleted = true WHERE id=?")
+@Where(clause = "deleted=false")
 public class Ticket extends EntityBase {
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "ticket_code", nullable = false, unique = true, length = 36)
     private String ticketCode;
 
-    @OneToOne
-    @JoinColumn(name = "registration_id")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "registration_id", nullable = false)
     private Registration registration;
+
+    @Column(nullable = false)
+    private boolean deleted = false;
+
+    @Column(name = "valid_until")
+    private LocalDateTime validUntil;
+
+    @Column(name = "is_used")
+    private boolean isUsed = false;
+
+    @Column(name = "used_at")
+    private LocalDateTime usedAt;
+
+    protected void onCreate() {
+        super.onCreate();
+        if (ticketCode == null) {
+            ticketCode = UUID.randomUUID().toString();
+        }
+    }
 }

@@ -7,33 +7,42 @@ import com.LiqaaTech.Exceptions.NotFoundException;
 import com.LiqaaTech.Mappers.UserMapper;
 import com.LiqaaTech.Repositories.UserRepository;
 import com.LiqaaTech.Services.Interf.UserService;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 public class UserServiceImpl implements UserService {
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
+
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private UserMapper userMapper;
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper) {
+        this.userRepository = userRepository;
+        this.userMapper = userMapper;
+    }
 
     @Override
     public UserDTO createUser(UserDTO userDTO) {
+        if (userDTO == null) {
+            throw new IllegalArgumentException("User data cannot be null");
+        }
+
         User user = userMapper.toEntity(userDTO);
-        if(user.getRole() == null){
+        if(user.getRole() == null) {
             user.setRole(Role.PARTICIPANT);
         }
-        userRepository.save(user);
-        return userMapper.toDTO(user);
+        User savedUser = userRepository.save(user);
+        return userMapper.toDTO(savedUser);
     }
 
     @Override
     public List<UserDTO> getAllUsers() {
         List<User> users = userRepository.findAll();
-        if(users.isEmpty()){
+        if(users.isEmpty()) {
             throw new NotFoundException("No Users found");
         }
         return userMapper.toDTOList(users);
@@ -41,25 +50,41 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO getUserById(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("User ID cannot be null");
+        }
+
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException("User not found with id: " + id));
         return userMapper.toDTO(user);
     }
 
     @Override
     public UserDTO updateUser(Long id, UserDTO userDTO) {
-        User savedUser = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + id));
+        if (id == null || userDTO == null) {
+            throw new IllegalArgumentException("User ID and data cannot be null");
+        }
+
+        User savedUser = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User not found with id: " + id));
+
         savedUser.setEmail(userDTO.getEmail());
         savedUser.setUsername(userDTO.getUsername());
         savedUser.setRole(userDTO.getRole());
         savedUser.setEnabled(userDTO.isEnabled());
-        userRepository.save(savedUser);
-        return userMapper.toDTO(savedUser);
+
+        User updatedUser = userRepository.save(savedUser);
+        return userMapper.toDTO(updatedUser);
     }
 
     @Override
     public void deleteUser(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + id));
+        if (id == null) {
+            throw new IllegalArgumentException("User ID cannot be null");
+        }
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User not found with id: " + id));
         userRepository.delete(user);
     }
 }
