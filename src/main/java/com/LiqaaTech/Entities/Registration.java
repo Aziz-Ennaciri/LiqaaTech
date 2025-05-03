@@ -1,5 +1,6 @@
 package com.LiqaaTech.Entities;
 
+import com.LiqaaTech.Enums.AttendanceStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -50,13 +51,6 @@ public class Registration extends EntityBase {
             ticket.setRegistration(this);
         }
         this.ticket = ticket;
-    }
-
-    public enum AttendanceStatus {
-        REGISTERED,
-        CHECKED_IN,
-        NO_SHOW,
-        CANCELLED
     }
 
     protected void onCreate() {
