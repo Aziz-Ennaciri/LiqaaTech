@@ -8,6 +8,8 @@ import org.hibernate.annotations.Where;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -31,12 +33,14 @@ public class User extends EntityBase {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role;
+    @Builder.Default
+    private Role role = Role.PARTICIPANT;
 
     @Column(nullable = false)
     private boolean enabled = true;
 
     @Column(nullable = false)
+    @Builder.Default
     private boolean deleted = false;
 
     @OneToMany(mappedBy = "organizer", cascade = CascadeType.ALL)

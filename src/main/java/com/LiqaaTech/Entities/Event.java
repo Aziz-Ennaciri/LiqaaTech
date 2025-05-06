@@ -6,65 +6,69 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
+@Entity
+@Table(name = "events")
 @Getter
 @Setter
-@Entity
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "events")
+@Builder
 @SQLDelete(sql = "UPDATE events SET deleted = true WHERE id=?")
 @Where(clause = "deleted=false")
-public class Event extends EntityBase {
+public class Event {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false)
     private String title;
-
-    @Column(nullable = false)
-    private String location;
-
-    @Column(nullable = false)
-    private LocalDateTime date;
 
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "image_url")
+    @Column(nullable = false)
+    private LocalDateTime startDateTime;
+
+    @Column(nullable = false)
+    private LocalDateTime endDateTime;
+
+    @Column(nullable = false)
+    private String location;
+
+    @Column
     private String imageUrl;
 
-    @Column(name = "is_public", nullable = false)
-    private boolean isPublic = true;
+    @Column(nullable = false)
+    private Integer capacity;
 
-    @Column(length = 50)
-    private String category;
+    @Column(nullable = false)
+    private Double price;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean isActive = true;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean deleted = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organizer_id", nullable = false)
     private User organizer;
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "event_categories",
+        joinColumns = @JoinColumn(name = "event_id"),
+        inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    @Builder.Default
+    private Set<Category> categories = new HashSet<>();
+
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<Registration> registrations = new ArrayList<>();
-
-    @Column(nullable = false)
-    private boolean deleted = false;
-
-    @Column(name = "max_participants")
-    private Integer maxParticipants;
-
-    @Column(name = "registration_deadline")
-    private LocalDateTime registrationDeadline;
-
-    public void addRegistration(Registration registration) {
-        registrations.add(registration);
-        registration.setEvent(this);
-    }
-
-    public void removeRegistration(Registration registration) {
-        registrations.remove(registration);
-        registration.setEvent(null);
-    }
+    private Set<Registration> registrations = new HashSet<>();
 }
