@@ -1,4 +1,4 @@
-package com.LiqaaTech.Controllers;
+package com.LiqaaTech.ControllersAPIs;
 
 import com.LiqaaTech.Entities.User;
 import com.LiqaaTech.Repositories.UserRepository;
