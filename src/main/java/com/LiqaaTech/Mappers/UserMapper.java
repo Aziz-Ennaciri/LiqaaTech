@@ -3,40 +3,31 @@ package com.LiqaaTech.Mappers;
 import com.LiqaaTech.DTOs.UserDTO;
 import com.LiqaaTech.Entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class UserMapper {
     @Autowired
-    @Lazy
-    private EventMapper eventMapper;
-    @Autowired
-    @Lazy
     private RegistrationMapper registrationMapper;
 
     public UserDTO toDTO(User user) {
         if (user == null) {
             return null;
         }
-
+        
         UserDTO userDTO = new UserDTO();
         userDTO.setEmail(user.getEmail());
         userDTO.setUsername(user.getUsername());
         userDTO.setRole(user.getRole());
         userDTO.setEnabled(user.isEnabled());
-
+        
         if (user.getRegistrations() != null) {
-            userDTO.setRegistrationsDTO(registrationMapper.toDTOListWithoutUser(user.getRegistrations()));
+            userDTO.setRegistrationsDTO(registrationMapper.toDTOList(user.getRegistrations()));
         }
-
-        if (user.getOrganizedEvents() != null) {
-            userDTO.setOrganizedEventsDTO(eventMapper.toDTOList(user.getOrganizedEvents()));
-        }
-
+        
         return userDTO;
     }
 
@@ -44,36 +35,36 @@ public class UserMapper {
         if (userDTO == null) {
             return null;
         }
-
+        
         User user = new User();
         user.setEmail(userDTO.getEmail());
         user.setUsername(userDTO.getUsername());
         user.setRole(userDTO.getRole());
         user.setEnabled(userDTO.isEnabled());
-
+        
         if (userDTO.getRegistrationsDTO() != null) {
-            user.setRegistrations(registrationMapper.toEntityListWithoutUser(userDTO.getRegistrationsDTO()));
+            user.setRegistrations(registrationMapper.toEntityList(userDTO.getRegistrationsDTO()));
         }
-
-        if (userDTO.getOrganizedEventsDTO() != null) {
-            user.setOrganizedEvents(eventMapper.toEntityList(userDTO.getOrganizedEventsDTO()));
-        }
-
+        
         return user;
     }
 
     public List<UserDTO> toDTOList(List<User> users) {
         if (users == null) {
-            return new ArrayList<>();
+            return null;
         }
-        return users.stream().map(this::toDTO).toList();
+        return users.stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
     }
 
     public List<User> toEntityList(List<UserDTO> dtos) {
         if (dtos == null) {
-            return new ArrayList<>();
+            return null;
         }
-        return dtos.stream().map(this::toEntity).toList();
+        return dtos.stream()
+                .map(this::toEntity)
+                .collect(Collectors.toList());
     }
 
     public UserDTO toDTOWithoutEvents(User user) {

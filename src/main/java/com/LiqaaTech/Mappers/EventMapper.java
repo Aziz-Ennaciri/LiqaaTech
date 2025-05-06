@@ -1,46 +1,47 @@
 package com.LiqaaTech.Mappers;
 
 import com.LiqaaTech.DTOs.EventDTO;
+import com.LiqaaTech.DTOs.RegistrationDTO;
+import com.LiqaaTech.DTOs.CategoryDTO;
 import com.LiqaaTech.Entities.Event;
+import com.LiqaaTech.Entities.Registration;
+import com.LiqaaTech.Entities.Category;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class EventMapper {
     @Autowired
-    @Lazy
     private RegistrationMapper registrationMapper;
+    
     @Autowired
-    @Lazy
-    private UserMapper userMapper;
+    private CategoryMapper categoryMapper;
 
     public EventDTO toDTO(Event event) {
         if (event == null) {
             return null;
         }
 
-        EventDTO eventDTO = new EventDTO();
-        eventDTO.setTitle(event.getTitle());
-        eventDTO.setLocation(event.getLocation());
-        eventDTO.setDate(event.getDate());
-        eventDTO.setDescription(event.getDescription());
-        eventDTO.setImageUrl(event.getImageUrl());
-        eventDTO.setPublic(event.isPublic());
-        eventDTO.setCategory(event.getCategory());
-
-        if (event.getOrganizer() != null) {
-            eventDTO.setOrganizerDTO(userMapper.toDTOWithoutEvents(event.getOrganizer()));
-        }
-
-        if (event.getRegistrations() != null) {
-            eventDTO.setRegistrationsDTO(registrationMapper.toDTOListWithoutEvent(event.getRegistrations()));
-        }
-
-        return eventDTO;
+        return EventDTO.builder()
+                .id(event.getId())
+                .title(event.getTitle())
+                .description(event.getDescription())
+                .startDateTime(event.getStartDateTime())
+                .endDateTime(event.getEndDateTime())
+                .location(event.getLocation())
+                .imageUrl(event.getImageUrl())
+                .capacity(event.getCapacity())
+                .price(event.getPrice())
+                .isActive(event.getIsActive())
+                .organizerId(event.getOrganizer().getId())
+                .organizerName(event.getOrganizer().getUsername())
+                .categories(convertCategoriesToDTO(event.getCategories()))
+                .registrations(convertRegistrationsToDTO(event.getRegistrations()))
+                .build();
     }
 
     public Event toEntity(EventDTO eventDTO) {
@@ -49,57 +50,34 @@ public class EventMapper {
         }
 
         Event event = new Event();
+        event.setId(eventDTO.getId());
         event.setTitle(eventDTO.getTitle());
-        event.setLocation(eventDTO.getLocation());
-        event.setDate(eventDTO.getDate());
         event.setDescription(eventDTO.getDescription());
+        event.setStartDateTime(eventDTO.getStartDateTime());
+        event.setEndDateTime(eventDTO.getEndDateTime());
+        event.setLocation(eventDTO.getLocation());
         event.setImageUrl(eventDTO.getImageUrl());
-        event.setPublic(eventDTO.isPublic());
-        event.setCategory(eventDTO.getCategory());
-
-        if (eventDTO.getOrganizerDTO() != null) {
-            event.setOrganizer(userMapper.toEntityWithoutEvents(eventDTO.getOrganizerDTO()));
-        }
-
-        if (eventDTO.getRegistrationsDTO() != null) {
-            event.setRegistrations(registrationMapper.toEntityListWithoutEvent(eventDTO.getRegistrationsDTO()));
-        }
-
+        event.setCapacity(eventDTO.getCapacity());
+        event.setPrice(eventDTO.getPrice());
+        event.setIsActive(eventDTO.getIsActive());
         return event;
     }
 
-    public List<EventDTO> toDTOList(List<Event> events) {
-        if (events == null) {
-            return new ArrayList<>();
-        }
-        return events.stream().map(this::toDTO).toList();
-    }
-
-    public List<Event> toEntityList(List<EventDTO> dtos) {
-        if (dtos == null) {
-            return new ArrayList<>();
-        }
-        return dtos.stream().map(this::toEntity).toList();
-    }
-
-    public EventDTO toDTOWithoutRegistrations(Event event) {
-        if (event == null) {
+    private List<CategoryDTO> convertCategoriesToDTO(Set<Category> categories) {
+        if (categories == null) {
             return null;
         }
+        return categories.stream()
+                .map(categoryMapper::toDTO)
+                .collect(Collectors.toList());
+    }
 
-        EventDTO eventDTO = new EventDTO();
-        eventDTO.setTitle(event.getTitle());
-        eventDTO.setLocation(event.getLocation());
-        eventDTO.setDate(event.getDate());
-        eventDTO.setDescription(event.getDescription());
-        eventDTO.setImageUrl(event.getImageUrl());
-        eventDTO.setPublic(event.isPublic());
-        eventDTO.setCategory(event.getCategory());
-
-        if (event.getOrganizer() != null) {
-            eventDTO.setOrganizerDTO(userMapper.toDTOWithoutEvents(event.getOrganizer()));
+    private List<RegistrationDTO> convertRegistrationsToDTO(Set<Registration> registrations) {
+        if (registrations == null) {
+            return null;
         }
-
-        return eventDTO;
+        return registrations.stream()
+                .map(registrationMapper::toDTO)
+                .collect(Collectors.toList());
     }
 }
