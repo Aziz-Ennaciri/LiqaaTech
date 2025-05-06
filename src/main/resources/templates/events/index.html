@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/base}">
+<head>
+    <title>Events - LiqaaTech</title>
+    <th:block layout:fragment="styles">
+        <style>
+            .event-card {
+                transition: transform 0.2s;
+            }
+            .event-card:hover {
+                transform: translateY(-5px);
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- Hero Section -->
+        <div class="bg-indigo-600">
+            <div class="max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h1 class="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
+                        Discover Amazing Events
+                    </h1>
+                    <p class="mt-6 max-w-2xl mx-auto text-xl text-indigo-100">
+                        Find and join the most exciting events in your area. From tech conferences to networking meetups.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search and Filters -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-4">
+                    <div>
+                        <label for="search" class="block text-sm font-medium text-gray-700">Search</label>
+                        <div class="mt-1 relative rounded-md shadow-sm">
+                            <input type="text" name="search" id="search" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-4 pr-12 sm:text-sm border-gray-300 rounded-md" placeholder="Search events...">
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                                <i class="fas fa-search text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="category" class="block text-sm font-medium text-gray-700">Category</label>
+                        <select id="category" name="category" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                            <option value="">All Categories</option>
+                            <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}">Category</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="dateRange" class="block text-sm font-medium text-gray-700">Date Range</label>
+                        <input type="date" id="dateRange" name="dateRange" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                    <div>
+                        <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                        <select id="status" name="status" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                            <option value="">All Status</option>
+                            <option value="UPCOMING">Upcoming</option>
+                            <option value="ONGOING">Ongoing</option>
+                            <option value="COMPLETED">Completed</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Events Grid -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div th:each="event : ${events}" class="bg-white overflow-hidden shadow rounded-lg event-card">
+                    <div class="relative">
+                        <img th:src="${event.imageUrl}" alt="Event image" class="w-full h-48 object-cover">
+                        <div class="absolute top-2 right-2">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full" 
+                                  th:classappend="${event.status == 'UPCOMING' ? 'bg-green-100 text-green-800' : 
+                                                  event.status == 'ONGOING' ? 'bg-blue-100 text-blue-800' : 
+                                                  'bg-gray-100 text-gray-800'}"
+                                  th:text="${event.status}">
+                                Status
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-medium text-gray-900" th:text="${event.title}">Event Title</h3>
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-800" th:text="${event.category}">
+                                Category
+                            </span>
+                        </div>
+                        <p class="mt-2 text-sm text-gray-500" th:text="${event.description}">Event description</p>
+                        <div class="mt-4">
+                            <div class="flex items-center text-sm text-gray-500">
+                                <i class="fas fa-calendar-alt mr-2"></i>
+                                <span th:text="${#temporals.format(event.startDate, 'dd MMM yyyy')}">Date</span>
+                            </div>
+                            <div class="flex items-center text-sm text-gray-500 mt-1">
+                                <i class="fas fa-clock mr-2"></i>
+                                <span th:text="${#temporals.format(event.startTime, 'HH:mm')}">Time</span>
+                            </div>
+                            <div class="flex items-center text-sm text-gray-500 mt-1">
+                                <i class="fas fa-map-marker-alt mr-2"></i>
+                                <span th:text="${event.location}">Location</span>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fas fa-users text-gray-400 mr-2"></i>
+                                    <span class="text-sm text-gray-500" th:text="${event.registrationCount + '/' + event.capacity}">0/100</span>
+                                </div>
+                                <a th:href="@{'/events/' + ${event.id}}" class="text-indigo-600 hover:text-indigo-900 text-sm font-medium">
+                                    View Details
+                                </a>
+                            </div>
+                            <div class="mt-2 w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-indigo-600 h-2 rounded-full" th:style="'width: ' + ${(event.registrationCount / event.capacity) * 100} + '%'"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- No Events Message -->
+            <div th:if="${#lists.isEmpty(events)}" class="text-center py-12">
+                <i class="fas fa-calendar-times text-4xl text-gray-400 mb-4"></i>
+                <h3 class="text-lg font-medium text-gray-900">No events found</h3>
+                <p class="mt-1 text-sm text-gray-500">There are currently no events available. Check back later!</p>
+            </div>
+
+            <!-- Create Event Button -->
+            <div class="fixed bottom-8 right-8">
+                <button type="button" class="inline-flex items-center p-3 border border-transparent rounded-full shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" data-modal-target="createEventModal">
+                    <i class="fas fa-plus h-6 w-6"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <th:block layout:fragment="scripts">
+        <script>
+            // Add your JavaScript here
+        </script>
+    </th:block>
+</body>
+</html> 
