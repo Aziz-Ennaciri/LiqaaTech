@@ -12,11 +12,14 @@ import java.util.List;
 
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Schema(description = "Data Transfer Object for Event information")
 public class EventDTO {
+
+    @Schema(description = "Event ID")
+    private Long id;
 
     @NotBlank(message = "Title is required")
     @Size(min = 3, max = 100, message = "Title must be between 3 and 100 characters")
@@ -31,7 +34,13 @@ public class EventDTO {
     @Future(message = "Event date must be in the future")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Schema(description = "Event date and time", example = "2024-12-31 15:00:00")
-    private LocalDateTime date;
+    private LocalDateTime startDateTime;
+
+    @NotNull(message = "End date is required")
+    @Future(message = "Event end date must be in the future")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Schema(description = "Event end date and time", example = "2024-12-31 17:00:00")
+    private LocalDateTime endDateTime;
 
     @Size(max = 2000, message = "Description cannot exceed 2000 characters")
     @Schema(description = "Event description")
@@ -41,26 +50,26 @@ public class EventDTO {
     @Schema(description = "URL of the event image")
     private String imageUrl;
 
-    @Schema(description = "Whether the event is public", defaultValue = "true")
-    private boolean isPublic = true;
+    @Schema(description = "Event capacity", example = "100")
+    private Integer capacity;
 
-    @Schema(description = "Event category", example = "Technology")
-    private String category;
+    @Schema(description = "Event price", example = "50.00")
+    private Double price;
+
+    @Schema(description = "Whether the event is active", defaultValue = "true")
+    private Boolean isActive = true;
 
     @NotNull(message = "Organizer information is required")
-    @Schema(description = "Event organizer information")
-    private UserDTO organizerDTO;
+    @Schema(description = "Event organizer ID")
+    private Long organizerId;
+
+    @Schema(description = "Event organizer name")
+    private String organizerName;
+
+    @Schema(description = "List of event categories")
+    private List<CategoryDTO> categories;
 
     @Builder.Default
     @Schema(description = "List of registrations for the event")
-    private List<RegistrationDTO> registrationsDTO = new ArrayList<>();
-
-    @Min(value = 1, message = "Maximum participants must be at least 1")
-    @Schema(description = "Maximum number of participants allowed")
-    private Integer maxParticipants;
-
-    @Future(message = "Registration deadline must be in the future")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @Schema(description = "Registration deadline")
-    private LocalDateTime registrationDeadline;
+    private List<RegistrationDTO> registrations = new ArrayList<>();
 }

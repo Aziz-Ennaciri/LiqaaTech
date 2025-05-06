@@ -1,5 +1,6 @@
 package com.LiqaaTech.DTOs;
 
+import com.LiqaaTech.Enums.RegistrationStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -40,4 +41,9 @@ public class RegistrationDTO {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Schema(description = "Check-in time")
     private LocalDateTime checkInTime;
+
+    @Builder.Default
+    private RegistrationStatus status = RegistrationStatus.PENDING;
+
+    private String notes;
 }
