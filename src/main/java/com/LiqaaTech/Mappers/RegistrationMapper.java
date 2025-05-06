@@ -33,8 +33,16 @@ public class RegistrationMapper {
         registration.setRegisteredAt(dto.getRegisteredAt());
         registration.setInWaitingList(dto.isInWaitingList());
         registration.setCheckInTime(dto.getCheckInTime());
-        // Note: participant, event, and ticket need to be set separately in the service layer
         return registration;
+    }
+
+    public void updateEntityFromDTO(RegistrationDTO dto, Registration entity) {
+        if (dto == null || entity == null) {
+            return;
+        }
+        entity.setRegisteredAt(dto.getRegisteredAt());
+        entity.setInWaitingList(dto.isInWaitingList());
+        entity.setCheckInTime(dto.getCheckInTime());
     }
 
     public List<RegistrationDTO> toDTOList(List<Registration> registrations) {

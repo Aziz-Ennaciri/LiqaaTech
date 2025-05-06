@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -49,62 +50,45 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     @Override
-    public List<RegistrationDTO> getAllRegistrations(Long eventId) {
-        if (eventId == null) {
-            throw new IllegalArgumentException("Event ID cannot be null");
-        }
-
-        List<Registration> registrations = registrationRepository.findByEventId(eventId);
-        if(registrations.isEmpty()) {
-            throw new NotFoundException("No registrations found for event: " + eventId);
-        }
-        return registrationMapper.toDTOList(registrations);
+    public List<RegistrationDTO> getAllRegistrations() {
+        return registrationRepository.findAll().stream()
+                .map(registrationMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public RegistrationDTO getRegistrationById(Long eventId, Long registrationId) {
-        if (eventId == null || registrationId == null) {
-            throw new IllegalArgumentException("Event ID and Registration ID cannot be null");
-        }
-
+    public RegistrationDTO getRegistrationById(Long registrationId) {
         Registration registration = registrationRepository.findById(registrationId)
-                .orElseThrow(() -> new NotFoundException("Registration not found with id: " + registrationId));
-
-
-
+                .orElseThrow(() -> new RuntimeException("Registration not found"));
         return registrationMapper.toDTO(registration);
     }
 
     @Override
     public RegistrationDTO updateRegistration(Long registrationId, RegistrationDTO registrationDTO) {
-        if (registrationId == null || registrationDTO == null) {
-            throw new IllegalArgumentException("Registration ID and data cannot be null");
-        }
-
-        Registration registration = registrationRepository.findById(registrationId)
-                .orElseThrow(() -> new NotFoundException("Registration not found with id: " + registrationId));
-
-        registration.setParticipant(userMapper.toEntity(registrationDTO.getParticipantDTO()));
-        registration.setEvent(eventMapper.toEntity(registrationDTO.getEventDTO()));
-        registration.setRegisteredAt(registrationDTO.getRegisteredAt());
-        registration.setInWaitingList(registrationDTO.isInWaitingList());
-
-        if (registrationDTO.getTicketDTO() != null) {
-            registration.setTicket(ticketMapper.toEntity(registrationDTO.getTicketDTO()));
-        }
-
-        Registration updatedRegistration = registrationRepository.save(registration);
+        Registration existingRegistration = registrationRepository.findById(registrationId)
+                .orElseThrow(() -> new RuntimeException("Registration not found"));
+        
+        registrationMapper.updateEntityFromDTO(registrationDTO, existingRegistration);
+        Registration updatedRegistration = registrationRepository.save(existingRegistration);
         return registrationMapper.toDTO(updatedRegistration);
     }
 
     @Override
     public void deleteRegistration(Long registrationId) {
-        if (registrationId == null) {
-            throw new IllegalArgumentException("Registration ID cannot be null");
-        }
+        registrationRepository.deleteById(registrationId);
+    }
 
-        Registration registration = registrationRepository.findById(registrationId)
-                .orElseThrow(() -> new NotFoundException("Registration not found with id: " + registrationId));
-        registrationRepository.delete(registration);
+    @Override
+    public List<RegistrationDTO> getRegistrationsByEventId(Long eventId) {
+        return registrationRepository.findByEventId(eventId).stream()
+                .map(registrationMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<RegistrationDTO> getRegistrationsByUserId(Long userId) {
+        return registrationRepository.findByUserId(userId).stream()
+                .map(registrationMapper::toDTO)
+                .collect(Collectors.toList());
     }
 }

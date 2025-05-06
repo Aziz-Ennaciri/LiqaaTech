@@ -37,6 +37,13 @@ public class TicketMapper {
         return ticket;
     }
 
+    public void updateEntityFromDTO(TicketDTO dto, Ticket entity) {
+        if (dto == null || entity == null) {
+            return;
+        }
+        entity.setTicketCode(dto.getTicketCode());
+    }
+
     public List<TicketDTO> toDTOList(List<Ticket> tickets) {
         if (tickets == null) {
             return null;
