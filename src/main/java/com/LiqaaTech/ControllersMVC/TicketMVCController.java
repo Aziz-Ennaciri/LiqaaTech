@@ -1,4 +1,4 @@
-package com.LiqaaTech.ControllerMVC;
+package com.LiqaaTech.ControllersMVC;
 
 import com.LiqaaTech.Services.Interf.TicketService;
 import org.springframework.beans.factory.annotation.Autowired;
