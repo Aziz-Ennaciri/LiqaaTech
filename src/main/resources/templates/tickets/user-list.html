@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>My Tickets</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="text-center mb-8">
+                <h1 class="text-2xl sm:text-3xl font-semibold text-gray-900 dark:text-white mb-4">
+                    My Tickets
+                </h1>
+                <p class="text-gray-600 dark:text-gray-300 text-sm">
+                    View and manage your event tickets
+                </p>
+            </div>
+
+            <div class="space-y-6">
+                <div th:if="${#lists.isEmpty(tickets)}" class="text-center py-12">
+                    <p class="text-gray-600 dark:text-gray-300">
+                        You haven't registered for any events yet.
+                    </p>
+                    <a th:href="@{/events}" 
+                       class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+                        Browse Events
+                    </a>
+                </div>
+
+                <div th:unless="${#lists.isEmpty(tickets)}" class="space-y-4">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                                    Total Tickets: <span th:text="${#lists.size(tickets)}">0</span>
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <thead class="bg-gray-50 dark:bg-gray-700">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Event</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Ticket Number</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Price</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Used At</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                <tr th:each="ticket : ${tickets}">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                            <a th:href="@{/events/{id}(id=${ticket.event.id})}" 
+                                               class="hover:text-indigo-600 dark:hover:text-indigo-400">
+                                                <span th:text="${ticket.event.title}">Event Name</span>
+                                            </a>
+                                        </div>
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                                            <span th:text="${#temporals.format(ticket.event.dateTime, 'MMM d, yyyy h:mm a')}">May 15, 2025 5:00 PM</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                            <span th:text="${ticket.ticketNumber}">TICK-1234567890</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span th:if="${ticket.status == 'PENDING'}" 
+                                              class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100">
+                                            Pending
+                                        </span>
+                                        <span th:if="${ticket.status == 'CONFIRMED'}" 
+                                              class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
+                                            Confirmed
+                                        </span>
+                                        <span th:if="${ticket.status == 'CANCELLED'}" 
+                                              class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100">
+                                            Cancelled
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                        <span th:text="${#numbers.formatCurrency(ticket.price)}">$100.00</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                        <span th:text="${ticket.usedAt != null ? #temporals.format(ticket.usedAt, 'MMM d, yyyy h:mm a') : 'Not used'}">Not used</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <form th:action="@{/tickets/cancel/{id}(id=${ticket.id})}" 
+                                              method="post" 
+                                              class="inline" 
+                                              th:if="${ticket.status == 'PENDING'}">
+                                            <button type="submit" 
+                                                    class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
+                                                Cancel
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

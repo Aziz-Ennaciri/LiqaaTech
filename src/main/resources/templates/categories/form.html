@@ -1,50 +1,60 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/base}">
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
 <head>
     <title th:text="${category.id == null ? 'Create Category' : 'Edit Category'}">Category Form</title>
 </head>
 <body>
-<div layout:fragment="content">
-    <!-- Page Header -->
-    <div class="bg-white shadow">
-        <div class="px-4 sm:px-6 lg:max-w-7xl lg:mx-auto lg:px-8">
-            <div class="py-6 md:flex md:items-center md:justify-between">
-                <div class="flex-1 min-w-0">
-                    <h1 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate" th:text="${category.id == null ? 'Create Category' : 'Edit Category'}">
-                        Category Form
-                    </h1>
+    <div layout:fragment="content">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title" th:text="${category.id == null ? 'Create Category' : 'Edit Category'}">
+                            Category Form
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="${category.id == null ? '/categories/create' : '/categories/edit/' + category.id}"
+                              th:object="${category}"
+                              method="post"
+                              class="needs-validation"
+                              novalidate>
+                            
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Category Name</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="name" 
+                                       th:field="*{name}"
+                                       required>
+                                <div class="text-danger" th:if="${#fields.hasErrors('name')}" 
+                                     th:errors="*{name}"></div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea class="form-control" 
+                                          id="description" 
+                                          th:field="*{description}"
+                                          rows="3"
+                                          required></textarea>
+                                <div class="text-danger" th:if="${#fields.hasErrors('description')}" 
+                                     th:errors="*{description}"></div>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <span th:text="${category.id == null ? 'Create' : 'Update'}">Submit</span>
+                                </button>
+                                <a th:href="@{/categories}" class="btn btn-secondary">Cancel</a>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Category Form -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
-        <div class="bg-white shadow rounded-lg">
-            <form th:action="@{/categories/save}" th:object="${category}" method="post" class="space-y-6 p-6">
-                <input type="hidden" th:field="*{id}">
-                
-                <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
-                    <input type="text" th:field="*{name}" id="name" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
-                </div>
-
-                <div>
-                    <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
-                    <textarea th:field="*{description}" id="description" rows="3" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"></textarea>
-                </div>
-
-                <div class="flex justify-end space-x-3">
-                    <a href="/categories" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Cancel
-                    </a>
-                    <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Save
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 </body>
 </html> 

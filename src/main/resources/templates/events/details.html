@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/main}">
+<head>
+    <title th:text="${event.title + ' - LiqaaTech'}">Event Details - LiqaaTech</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <!-- Event Header -->
+    <div class="relative">
+        <div class="absolute inset-0">
+            <img th:src="${event.imageUrl}" th:alt="${event.title}" class="w-full h-96 object-cover">
+            <div class="absolute inset-0 bg-gray-900 opacity-50"></div>
+        </div>
+        <div class="relative max-w-7xl mx-auto py-24 px-4 sm:py-32 sm:px-6 lg:px-8">
+            <h1 class="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl" th:text="${event.title}"></h1>
+            <p class="mt-6 text-xl text-white max-w-3xl" th:text="${event.description}"></p>
+        </div>
+    </div>
+
+    <!-- Event Details -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Main Content -->
+            <div class="lg:col-span-2">
+                <!-- Event Information -->
+                <div class="bg-white shadow rounded-lg p-6 mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">About This Event</h2>
+                    <div class="prose max-w-none" th:text="${event.description}"></div>
+                </div>
+
+                <!-- Event Schedule -->
+                <div class="bg-white shadow rounded-lg p-6 mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Schedule</h2>
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <i class="far fa-calendar-alt text-indigo-600 text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-medium text-gray-900">Date & Time</h3>
+                                <p class="mt-1 text-gray-600">
+                                    <span th:text="${#temporals.format(event.startDateTime, 'EEEE, MMMM dd, yyyy')}"></span>
+                                    <br>
+                                    <span th:text="${#temporals.format(event.startDateTime, 'h:mm a') + ' - ' + #temporals.format(event.endDateTime, 'h:mm a')}"></span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-map-marker-alt text-indigo-600 text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-medium text-gray-900">Location</h3>
+                                <p class="mt-1 text-gray-600" th:text="${event.location}"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Organizer Information -->
+                <div class="bg-white shadow rounded-lg p-6">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Organizer</h2>
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <img class="h-12 w-12 rounded-full" th:src="${event.organizer.profileImageUrl}" th:alt="${event.organizer.username}">
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-medium text-gray-900" th:text="${event.organizer.username}"></h3>
+                            <p class="text-gray-600" th:text="${event.organizer.email}"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="lg:col-span-1">
+                <!-- Ticket Booking Card -->
+                <div class="bg-white shadow rounded-lg p-6 sticky top-6">
+                    <div class="text-center mb-6">
+                        <span class="text-4xl font-bold text-indigo-600" th:text="${'$' + event.ticketPrice}"></span>
+                        <span class="text-gray-500">per ticket</span>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">Available Spots</span>
+                            <span class="font-medium" th:text="${event.availableSpots}"></span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">Total Capacity</span>
+                            <span class="font-medium" th:text="${event.capacity}"></span>
+                        </div>
+                    </div>
+
+                    <div class="mt-6">
+                        <form th:action="@{/events/{id}/book(id=${event.id})}" method="post" th:if="${event.availableSpots > 0}">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                            <button type="submit" class="w-full btn-primary">
+                                <i class="fas fa-ticket-alt mr-2"></i>Book Now
+                            </button>
+                        </form>
+                        <div th:unless="${event.availableSpots > 0}" class="text-center">
+                            <p class="text-red-600 font-medium">Sold Out</p>
+                        </div>
+                    </div>
+
+                    <!-- Share Event -->
+                    <div class="mt-6 pt-6 border-t border-gray-200">
+                        <h3 class="text-sm font-medium text-gray-900 mb-3">Share This Event</h3>
+                        <div class="flex space-x-3">
+                            <a href="#" class="text-gray-400 hover:text-gray-500">
+                                <i class="fab fa-facebook text-xl"></i>
+                            </a>
+                            <a href="#" class="text-gray-400 hover:text-gray-500">
+                                <i class="fab fa-twitter text-xl"></i>
+                            </a>
+                            <a href="#" class="text-gray-400 hover:text-gray-500">
+                                <i class="fab fa-linkedin text-xl"></i>
+                            </a>
+                            <a href="#" class="text-gray-400 hover:text-gray-500">
+                                <i class="fas fa-envelope text-xl"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html> 

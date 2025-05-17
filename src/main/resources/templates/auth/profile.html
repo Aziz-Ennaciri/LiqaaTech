@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/main}">
+<head>
+    <title>Your Profile - LiqaaTech</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="max-w-3xl mx-auto">
+        <div class="bg-white shadow rounded-lg">
+            <!-- Profile Header -->
+            <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+                <div class="flex items-center space-x-4">
+                    <img class="h-20 w-20 rounded-full" th:src="${#authentication.principal.profilePicture != null ? #authentication.principal.profilePicture : 'https://ui-avatars.com/api/?name=' + #authentication.principal.username}" alt="Profile picture">
+                    <div>
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" th:text="${#authentication.principal.username}">Username</h3>
+                        <p class="text-sm text-gray-500" th:text="${#authentication.principal.email}">email@example.com</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Content -->
+            <div class="px-4 py-5 sm:p-6">
+                <div class="space-y-6">
+                    <!-- Personal Information -->
+                    <div>
+                        <h4 class="text-lg font-medium text-gray-900 mb-4">Personal Information</h4>
+                        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Username</label>
+                                <p class="mt-1 text-sm text-gray-900" th:text="${#authentication.principal.username}">username</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Email</label>
+                                <p class="mt-1 text-sm text-gray-900" th:text="${#authentication.principal.email}">email@example.com</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Account Actions -->
+                    <div class="pt-6 border-t border-gray-200">
+                        <h4 class="text-lg font-medium text-gray-900 mb-4">Account Actions</h4>
+                        <div class="flex space-x-4">
+                            <a href="/settings" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+                                Edit Profile
+                            </a>
+                            <a href="/events/my-events" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                My Events
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html> 

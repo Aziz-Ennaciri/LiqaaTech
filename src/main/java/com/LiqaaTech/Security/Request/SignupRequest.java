@@ -20,5 +20,5 @@ public class SignupRequest {
     @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
 
-    private Role role = Role.PARTICIPANT; // Default role
+    private Role role = Role.ROLE_USER; // Default role
 } 

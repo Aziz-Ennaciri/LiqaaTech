@@ -1,14 +1,15 @@
 package com.LiqaaTech.Services.Impl;
 
 import com.LiqaaTech.DTOs.RegistrationDTO;
+import com.LiqaaTech.Entities.Event;
 import com.LiqaaTech.Entities.Registration;
-import com.LiqaaTech.Exceptions.NotFoundException;
-import com.LiqaaTech.Mappers.EventMapper;
-import com.LiqaaTech.Mappers.RegistrationMapper;
-import com.LiqaaTech.Mappers.TicketMapper;
-import com.LiqaaTech.Mappers.UserMapper;
+import com.LiqaaTech.Entities.User;
+import com.LiqaaTech.Enums.RegistrationStatus;
+import com.LiqaaTech.Repositories.EventRepository;
 import com.LiqaaTech.Repositories.RegistrationRepository;
+import com.LiqaaTech.Repositories.UserRepository;
 import com.LiqaaTech.Services.Interf.RegistrationService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,76 +20,120 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class RegistrationServiceImpl implements RegistrationService {
-    private final RegistrationRepository registrationRepository;
-    private final RegistrationMapper registrationMapper;
-    private final UserMapper userMapper;
-    private final EventMapper eventMapper;
-    private final TicketMapper ticketMapper;
 
     @Autowired
-    public RegistrationServiceImpl(RegistrationRepository registrationRepository,
-                                   RegistrationMapper registrationMapper,
-                                   UserMapper userMapper,
-                                   EventMapper eventMapper,
-                                   TicketMapper ticketMapper) {
-        this.registrationRepository = registrationRepository;
-        this.registrationMapper = registrationMapper;
-        this.userMapper = userMapper;
-        this.eventMapper = eventMapper;
-        this.ticketMapper = ticketMapper;
-    }
+    private RegistrationRepository registrationRepository;
 
-    @Override
-    public RegistrationDTO createRegistration(RegistrationDTO registrationDTO) {
-        if (registrationDTO == null) {
-            throw new IllegalArgumentException("Registration data cannot be null");
-        }
+    @Autowired
+    private UserRepository userRepository;
 
-        Registration registration = registrationMapper.toEntity(registrationDTO);
-        Registration savedRegistration = registrationRepository.save(registration);
-        return registrationMapper.toDTO(savedRegistration);
-    }
+    @Autowired
+    private EventRepository eventRepository;
 
     @Override
     public List<RegistrationDTO> getAllRegistrations() {
         return registrationRepository.findAll().stream()
-                .map(registrationMapper::toDTO)
+                .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public RegistrationDTO getRegistrationById(Long registrationId) {
-        Registration registration = registrationRepository.findById(registrationId)
-                .orElseThrow(() -> new RuntimeException("Registration not found"));
-        return registrationMapper.toDTO(registration);
+    public RegistrationDTO getRegistrationById(Long id) {
+        Registration registration = registrationRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Registration not found with id: " + id));
+        return convertToDTO(registration);
     }
 
     @Override
-    public RegistrationDTO updateRegistration(Long registrationId, RegistrationDTO registrationDTO) {
-        Registration existingRegistration = registrationRepository.findById(registrationId)
-                .orElseThrow(() -> new RuntimeException("Registration not found"));
+    public RegistrationDTO createRegistration(RegistrationDTO registrationDTO) {
+        User user = userRepository.findById(registrationDTO.getUserId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + registrationDTO.getUserId()));
         
-        registrationMapper.updateEntityFromDTO(registrationDTO, existingRegistration);
-        Registration updatedRegistration = registrationRepository.save(existingRegistration);
-        return registrationMapper.toDTO(updatedRegistration);
+        Event event = eventRepository.findById(registrationDTO.getEventId())
+                .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + registrationDTO.getEventId()));
+
+        Registration registration = new Registration();
+        registration.setUser(user);
+        registration.setEvent(event);
+        registration.setStatus(registrationDTO.getStatus());
+
+        Registration savedRegistration = registrationRepository.save(registration);
+        return convertToDTO(savedRegistration);
     }
 
     @Override
-    public void deleteRegistration(Long registrationId) {
-        registrationRepository.deleteById(registrationId);
+    public RegistrationDTO updateRegistration(Long id, RegistrationDTO registrationDTO) {
+        Registration registration = registrationRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Registration not found with id: " + id));
+
+        if (registrationDTO.getStatus() != null) {
+            registration.setStatus(registrationDTO.getStatus());
+        }
+
+        Registration updatedRegistration = registrationRepository.save(registration);
+        return convertToDTO(updatedRegistration);
+    }
+
+    @Override
+    public void deleteRegistration(Long id) {
+        if (!registrationRepository.existsById(id)) {
+            throw new EntityNotFoundException("Registration not found with id: " + id);
+        }
+        registrationRepository.deleteById(id);
+    }
+
+    @Override
+    public List<RegistrationDTO> getRegistrationsByUser(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new EntityNotFoundException("User not found with id: " + userId);
+        }
+        return registrationRepository.findByUserId(userId).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<RegistrationDTO> getRegistrationsByEvent(Long eventId) {
+        if (!eventRepository.existsById(eventId)) {
+            throw new EntityNotFoundException("Event not found with id: " + eventId);
+        }
+        return registrationRepository.findByEventId(eventId).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public RegistrationDTO cancelRegistration(Long id) {
+        Registration registration = registrationRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Registration not found with id: " + id));
+        
+        registration.setStatus(RegistrationStatus.CANCELLED);
+        Registration cancelledRegistration = registrationRepository.save(registration);
+        return convertToDTO(cancelledRegistration);
     }
 
     @Override
     public List<RegistrationDTO> getRegistrationsByEventId(Long eventId) {
-        return registrationRepository.findByEventId(eventId).stream()
-                .map(registrationMapper::toDTO)
-                .collect(Collectors.toList());
+        return getRegistrationsByEvent(eventId);
     }
 
     @Override
     public List<RegistrationDTO> getRegistrationsByUserId(Long userId) {
-        return registrationRepository.findByUserId(userId).stream()
-                .map(registrationMapper::toDTO)
-                .collect(Collectors.toList());
+        return getRegistrationsByUser(userId);
+    }
+
+    @Override
+    public int getTotalRegistrations() {
+        return (int) registrationRepository.count();
+    }
+
+    private RegistrationDTO convertToDTO(Registration registration) {
+        RegistrationDTO dto = new RegistrationDTO();
+        dto.setId(registration.getId());
+        dto.setUserId(registration.getUser().getId());
+        dto.setEventId(registration.getEvent().getId());
+        dto.setRegistrationDate(registration.getRegistrationDate());
+        dto.setStatus(registration.getStatus());
+        return dto;
     }
 }

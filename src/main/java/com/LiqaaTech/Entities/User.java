@@ -1,79 +1,96 @@
 package com.LiqaaTech.Entities;
 
-import com.LiqaaTech.Enums.Role;
 import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import lombok.Data;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-@Getter
-@Setter
+@Data
 @Entity
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "users")
-@SQLDelete(sql = "UPDATE users SET deleted = true WHERE id=?")
-@Where(clause = "deleted=false")
-public class User extends EntityBase {
-
-    @Column(nullable = false, unique = true, length = 100)
-    private String email;
-
-    @Column(nullable = false, length = 50)
+public class User extends EntityBase implements UserDetails {
+    @Column(unique = true, nullable = false)
     private String username;
 
+    @Column(unique = true, nullable = false)
+    private String email;
+
     @Column(nullable = false)
+    @JsonIgnore
     private String password;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    @Builder.Default
-    private Role role = Role.PARTICIPANT;
-
-    @Column(nullable = false)
+    private String firstName;
+    private String lastName;
+    private String phoneNumber;
+    private String address;
+    private String profilePicture;
     private boolean enabled = true;
 
-    @Column(nullable = false)
-    @Builder.Default
-    private boolean deleted = false;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "user_roles",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles = new HashSet<>();
 
-    @OneToMany(mappedBy = "organizer", cascade = CascadeType.ALL)
-    @Builder.Default
-    private List<Event> organizedEvents = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Set<Registration> registrations = new HashSet<>();
 
-    @OneToMany(mappedBy = "participant", cascade = CascadeType.ALL)
-    @Builder.Default
-    private List<Registration> registrations = new ArrayList<>();
-
-    @Column(length = 15)
-    private String phoneNumber;
-
-    @Column(name = "profile_picture_url")
-    private String profilePictureUrl;
-
-    public void addOrganizedEvent(Event event) {
-        organizedEvents.add(event);
-        event.setOrganizer(this);
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName().name()))
+                .collect(Collectors.toList());
     }
 
-    public void removeOrganizedEvent(Event event) {
-        organizedEvents.remove(event);
-        event.setOrganizer(null);
+    @Override
+    public String getUsername() {
+        return email;
     }
 
-    public void addRegistration(Registration registration) {
-        registrations.add(registration);
-        registration.setParticipant(this);
+    @Override
+    public String getPassword() {
+        return password;
     }
 
-    public void removeRegistration(Registration registration) {
-        registrations.remove(registration);
-        registration.setParticipant(null);
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 }

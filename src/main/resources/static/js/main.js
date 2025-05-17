@@ -11,7 +11,7 @@ const formatTime = (time) => {
     return new Intl.DateTimeFormat('en-US', {
         hour: '2-digit',
         minute: '2-digit'
-    }).format(new Date(`2000-01-01T${time}`));
+    }).format(new Date(time));
 };
 
 const formatCurrency = (amount) => {
@@ -35,121 +35,118 @@ const closeModal = (modalId) => {
 // Form Validation
 const validateForm = (formId) => {
     const form = document.getElementById(formId);
-    const requiredFields = form.querySelectorAll('[required]');
     let isValid = true;
 
-    requiredFields.forEach(field => {
+    // Reset previous validation states
+    form.querySelectorAll('.error-message').forEach(el => el.remove());
+    form.querySelectorAll('.border-red-500').forEach(el => {
+        el.classList.remove('border-red-500');
+        el.classList.add('border-gray-300');
+    });
+
+    // Required fields validation
+    form.querySelectorAll('[required]').forEach(field => {
         if (!field.value.trim()) {
             isValid = false;
             field.classList.add('border-red-500');
+            field.classList.remove('border-gray-300');
 
-            // Add error message if it doesn't exist
-            if (!field.nextElementSibling?.classList.contains('error-message')) {
-                const errorMessage = document.createElement('p');
-                errorMessage.className = 'mt-1 text-sm text-red-600 error-message';
-                errorMessage.textContent = 'This field is required';
-                field.parentNode.insertBefore(errorMessage, field.nextSibling);
-            }
-        } else {
-            field.classList.remove('border-red-500');
-            const errorMessage = field.nextElementSibling;
-            if (errorMessage?.classList.contains('error-message')) {
-                errorMessage.remove();
-            }
+            const error = document.createElement('p');
+            error.className = 'error-message text-red-500 text-sm mt-1';
+            error.textContent = 'This field is required';
+            field.parentNode.appendChild(error);
+        }
+    });
+
+    // Email validation
+    form.querySelectorAll('[type="email"]').forEach(field => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (field.value && !emailRegex.test(field.value)) {
+            isValid = false;
+            field.classList.add('border-red-500');
+            field.classList.remove('border-gray-300');
+
+            const error = document.createElement('p');
+            error.className = 'error-message text-red-500 text-sm mt-1';
+            error.textContent = 'Please enter a valid email address';
+            field.parentNode.appendChild(error);
         }
     });
 
     return isValid;
 };
 
-// Alert Messages
-const showAlert = (message, type = 'success') => {
-    const alertContainer = document.getElementById('alert-container');
-    if (!alertContainer) return;
+// Toast Notifications
+const showToast = (message, type = 'success') => {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
 
-    const alert = document.createElement('div');
-    alert.className = `alert alert-${type} fade-enter`;
-    alert.innerHTML = `
-        <div class="flex items-center">
-            <div class="flex-shrink-0">
-                ${type === 'success' ? '<i class="fas fa-check-circle text-green-400"></i>' :
-        type === 'error' ? '<i class="fas fa-exclamation-circle text-red-400"></i>' :
-            type === 'warning' ? '<i class="fas fa-exclamation-triangle text-yellow-400"></i>' :
-                '<i class="fas fa-info-circle text-blue-400"></i>'}
-            </div>
-            <div class="ml-3">
-                <p class="text-sm font-medium ${type === 'success' ? 'text-green-800' :
-        type === 'error' ? 'text-red-800' :
-            type === 'warning' ? 'text-yellow-800' :
-                'text-blue-800'}">${message}</p>
-            </div>
-            <div class="ml-auto pl-3">
-                <button type="button" class="alert-close">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        </div>
-    `;
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type} fade-in`;
 
-    alertContainer.appendChild(alert);
+    const icon = document.createElement('i');
+    icon.className = type === 'success' ? 'fas fa-check-circle mr-2' :
+        type === 'error' ? 'fas fa-exclamation-circle mr-2' :
+            'fas fa-exclamation-triangle mr-2';
 
-    // Add fade in effect
+    toast.appendChild(icon);
+    toast.appendChild(document.createTextNode(message));
+
+    container.appendChild(toast);
+
     setTimeout(() => {
-        alert.classList.add('fade-enter-active');
-    }, 10);
-
-    // Auto remove after 5 seconds
-    setTimeout(() => {
-        alert.classList.remove('fade-enter-active');
-        alert.classList.add('fade-exit-active');
-        setTimeout(() => {
-            alert.remove();
-        }, 200);
-    }, 5000);
-
-    // Close button handler
-    alert.querySelector('.alert-close').addEventListener('click', () => {
-        alert.classList.remove('fade-enter-active');
-        alert.classList.add('fade-exit-active');
-        setTimeout(() => {
-            alert.remove();
-        }, 200);
-    });
+        toast.remove();
+    }, 3000);
 };
 
-// Dropdown Handling
-document.addEventListener('click', (e) => {
-    const dropdowns = document.querySelectorAll('.dropdown');
-    dropdowns.forEach(dropdown => {
-        if (!dropdown.contains(e.target)) {
-            dropdown.querySelector('.dropdown-menu')?.classList.add('hidden');
-        }
-    });
+// View Toggle Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const gridView = document.getElementById('gridView');
+    const listView = document.getElementById('listView');
+    const eventsGrid = document.getElementById('eventsGrid');
+    const eventsList = document.getElementById('eventsList');
+
+    if (gridView && listView) {
+        // View Toggle
+        gridView.addEventListener('click', () => {
+            gridView.classList.add('text-indigo-600');
+            listView.classList.remove('text-indigo-600');
+            eventsGrid.classList.remove('hidden');
+            eventsList.classList.add('hidden');
+        });
+
+        listView.addEventListener('click', () => {
+            listView.classList.add('text-indigo-600');
+            gridView.classList.remove('text-indigo-600');
+            eventsList.classList.remove('hidden');
+            eventsGrid.classList.add('hidden');
+        });
+    }
+
+    // Filter Handling
+    const categorySelect = document.getElementById('category');
+    const dateFilter = document.getElementById('dateFilter');
+    const searchInput = document.getElementById('search');
+
+    if (categorySelect && dateFilter && searchInput) {
+        const updateEvents = debounce(() => {
+            const params = new URLSearchParams({
+                category: categorySelect.value,
+                date: dateFilter.value,
+                search: searchInput.value
+            });
+
+            window.location.href = `/events?${params.toString()}`;
+        }, 500);
+
+        categorySelect.addEventListener('change', updateEvents);
+        dateFilter.addEventListener('change', updateEvents);
+        searchInput.addEventListener('input', updateEvents);
+    }
 });
 
-const toggleDropdown = (dropdownId) => {
-    const dropdown = document.getElementById(dropdownId);
-    const menu = dropdown.querySelector('.dropdown-menu');
-    menu.classList.toggle('hidden');
-};
-
-// File Input Preview
-const handleFileInput = (input, previewId) => {
-    const preview = document.getElementById(previewId);
-    const file = input.files[0];
-
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            preview.src = e.target.result;
-            preview.classList.remove('hidden');
-        };
-        reader.readAsDataURL(file);
-    }
-};
-
-// Search Functionality
-const debounce = (func, wait) => {
+// Utility Functions
+function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
         const later = () => {
@@ -159,41 +156,11 @@ const debounce = (func, wait) => {
         clearTimeout(timeout);
         timeout = setTimeout(later, wait);
     };
-};
+}
 
-const handleSearch = debounce((searchTerm) => {
-    // Implement your search logic here
-    console.log('Searching for:', searchTerm);
-}, 300);
-
-// Form Submission with AJAX
-const submitFormAjax = async (formId, url, method = 'POST') => {
-    const form = document.getElementById(formId);
-    if (!validateForm(formId)) return;
-
-    const formData = new FormData(form);
-
-    try {
-        const response = await fetch(url, {
-            method: method,
-            body: formData
-        });
-
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-
-        const data = await response.json();
-        showAlert(data.message, 'success');
-        return data;
-    } catch (error) {
-        showAlert(error.message, 'error');
-        throw error;
-    }
-};
-
-// Initialize Tooltips
-const initTooltips = () => {
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize tooltips
     const tooltips = document.querySelectorAll('[data-tooltip]');
     tooltips.forEach(element => {
         const tooltip = document.createElement('div');
@@ -210,49 +177,7 @@ const initTooltips = () => {
 
         element.addEventListener('mouseleave', () => {
             tooltip.classList.add('opacity-0');
-            setTimeout(() => {
-                tooltip.remove();
-            }, 200);
+            setTimeout(() => tooltip.remove(), 200);
         });
     });
-};
-
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', () => {
-    initTooltips();
-
-    // Add form validation listeners
-    document.querySelectorAll('form').forEach(form => {
-        form.addEventListener('submit', (e) => {
-            if (!validateForm(form.id)) {
-                e.preventDefault();
-            }
-        });
-    });
-
-    // Add search input listeners
-    const searchInputs = document.querySelectorAll('[data-search]');
-    searchInputs.forEach(input => {
-        input.addEventListener('input', (e) => {
-            handleSearch(e.target.value);
-        });
-    });
-});
-
-// Export functions for use in other files
-window.utils = {
-    formatDate,
-    formatTime,
-    formatCurrency,
-    openModal,
-    closeModal,
-    validateForm,
-    showAlert,
-    toggleDropdown,
-    handleFileInput,
-    submitFormAjax
-};
-// Common JavaScript functions
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize any common functionality
 });

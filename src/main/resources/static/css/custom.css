@@ -1,83 +1,68 @@
-/* Custom styles for LiqaaTech */
+/* Add these to your existing custom.css */
 
-/* Smooth transitions */
-.transition-all {
-    transition: all 0.3s ease;
+/* Auth Forms */
+.auth-form {
+    @apply max-w-md w-full space-y-8;
 }
 
-/* Card hover effects */
-.event-card {
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+.auth-form-header {
+    @apply text-center;
 }
 
-.event-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+.auth-form-title {
+    @apply mt-6 text-3xl font-extrabold text-gray-900;
 }
 
-/* Custom button styles */
-.btn-primary {
-    @apply bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all;
+.auth-form-subtitle {
+    @apply mt-2 text-center text-sm text-gray-600;
 }
 
-.btn-secondary {
-    @apply bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all;
+.auth-form-link {
+    @apply font-medium text-indigo-600 hover:text-indigo-500;
 }
 
-/* Form styles */
-.form-input {
-    @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm;
+.auth-form-input {
+    @apply appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm;
 }
 
-/* Status badges */
-.status-badge {
-    @apply px-2 py-1 text-xs font-semibold rounded-full;
+.auth-form-input-first {
+    @apply rounded-t-md;
 }
 
-.status-upcoming {
-    @apply bg-green-100 text-green-800;
+.auth-form-input-last {
+    @apply rounded-b-md;
 }
 
-.status-ongoing {
-    @apply bg-blue-100 text-blue-800;
+.auth-form-button {
+    @apply group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500;
 }
 
-.status-completed {
-    @apply bg-gray-100 text-gray-800;
+.auth-form-button-icon {
+    @apply absolute left-0 inset-y-0 flex items-center pl-3;
 }
 
-/* Progress bar */
-.progress-bar {
-    @apply w-full bg-gray-200 rounded-full h-2;
+/* Auth Messages */
+.auth-message {
+    @apply rounded-md p-4 mb-4;
 }
 
-.progress-bar-fill {
-    @apply bg-indigo-600 h-2 rounded-full transition-all duration-300;
+.auth-message-error {
+    @apply bg-red-50 text-red-800;
 }
 
-/* Custom animations */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.auth-message-success {
+    @apply bg-green-50 text-green-800;
 }
 
-.animate-fade-in {
-    animation: fadeIn 0.3s ease-out;
+/* Protected Content */
+.protected-content {
+    @apply relative;
 }
 
-/* Responsive adjustments */
-@media (max-width: 640px) {
-    .event-card {
-        margin-bottom: 1rem;
-    }
-    
-    .search-filters {
-        grid-template-columns: 1fr;
-    }
-} 
+.protected-content-overlay {
+    @apply absolute inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center;
+}
+
+.protected-content-message {
+    @apply text-white text-lg font-medium;
+}

@@ -9,18 +9,18 @@ import java.util.stream.Collectors;
 
 @Component
 public class RegistrationMapper {
-    
+
     public RegistrationDTO toDTO(Registration registration) {
         if (registration == null) {
             return null;
         }
-        
         return RegistrationDTO.builder()
-                .registeredAt(registration.getRegisteredAt())
-                .inWaitingList(registration.isInWaitingList())
-                .attendanceStatus(registration.getAttendanceStatus() != null ? 
-                    registration.getAttendanceStatus().name() : null)
-                .checkInTime(registration.getCheckInTime())
+                .id(registration.getId())
+                .eventId(registration.getEvent() != null ? registration.getEvent().getId() : null)
+                .userId(registration.getUser() != null ? registration.getUser().getId() : null)
+                .status(registration.getStatus())
+                .registrationDate(registration.getRegistrationDate())
+                .registeredAt(registration.getRegistrationDate())
                 .build();
     }
 
@@ -28,21 +28,18 @@ public class RegistrationMapper {
         if (dto == null) {
             return null;
         }
-        
         Registration registration = new Registration();
-        registration.setRegisteredAt(dto.getRegisteredAt());
-        registration.setInWaitingList(dto.isInWaitingList());
-        registration.setCheckInTime(dto.getCheckInTime());
+        registration.setStatus(dto.getStatus());
+        registration.setRegistrationDate(dto.getRegistrationDate());
         return registration;
     }
 
-    public void updateEntityFromDTO(RegistrationDTO dto, Registration entity) {
-        if (dto == null || entity == null) {
+    public void updateEntityFromDTO(RegistrationDTO dto, Registration registration) {
+        if (dto == null || registration == null) {
             return;
         }
-        entity.setRegisteredAt(dto.getRegisteredAt());
-        entity.setInWaitingList(dto.isInWaitingList());
-        entity.setCheckInTime(dto.getCheckInTime());
+        registration.setStatus(dto.getStatus());
+        registration.setRegistrationDate(dto.getRegistrationDate());
     }
 
     public List<RegistrationDTO> toDTOList(List<Registration> registrations) {
@@ -62,4 +59,4 @@ public class RegistrationMapper {
                 .map(this::toEntity)
                 .collect(Collectors.toList());
     }
-}
+} 

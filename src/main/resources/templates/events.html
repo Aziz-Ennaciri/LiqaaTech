@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/base}">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/base}" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <title>Event Management</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
@@ -16,11 +16,11 @@
                         Event Management
                     </h1>
                 </div>
-                <div class="mt-4 flex md:mt-0 md:ml-4">
-                    <button type="button" class="ml-3 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" data-modal-target="createEventModal">
+                <div class="mt-4 flex md:mt-0 md:ml-4" sec:authorize="hasRole('ADMIN')">
+                    <a th:href="@{/events/create}" class="ml-3 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                         <i class="fas fa-calendar-plus mr-2"></i>
                         Create Event
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>
@@ -135,12 +135,14 @@
                             <a th:href="@{'/events/' + ${event.id}}" class="text-indigo-600 hover:text-indigo-900 mr-3">
                                 <i class="fas fa-eye"></i>
                             </a>
-                            <button class="text-indigo-600 hover:text-indigo-900 mr-3" th:data-event-id="${event.id}" onclick="editEvent(this.getAttribute('data-event-id'))">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="text-red-600 hover:text-red-900" th:data-event-id="${event.id}" onclick="deleteEvent(this.getAttribute('data-event-id'))">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                            <span sec:authorize="hasRole('ADMIN')">
+                                <button class="text-indigo-600 hover:text-indigo-900 mr-3" th:data-event-id="${event.id}" onclick="editEvent(this.getAttribute('data-event-id'))">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="text-red-600 hover:text-red-900" th:data-event-id="${event.id}" onclick="deleteEvent(this.getAttribute('data-event-id'))">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </span>
                         </td>
                     </tr>
                     </tbody>
@@ -193,12 +195,12 @@
     </div>
 
     <!-- Create/Edit Event Modal -->
-    <div id="eventModal" class="fixed z-10 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div id="eventModal" class="fixed z-10 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true" sec:authorize="hasRole('ADMIN')">
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
             <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <form id="eventForm" th:action="@{/admin/events/save}" method="post" enctype="multipart/form-data">
+                <form id="eventForm" th:action="@{/events/create}" method="post" enctype="multipart/form-data">
                     <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                         <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
                             Create New Event
@@ -297,13 +299,7 @@
         }
     }
 
-    // Event Listeners
-    document.querySelector('[data-modal-target="createEventModal"]').addEventListener('click', () => {
-        document.getElementById('eventForm').reset();
-        document.getElementById('eventId').value = '';
-        document.getElementById('modal-title').textContent = 'Create New Event';
-        openEventModal();
-    });
+    // Only add modal event listeners if user is admin (handled by sec:authorize)
 </script>
 </body>
 </html>

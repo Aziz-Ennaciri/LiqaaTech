@@ -1,7 +1,10 @@
 package com.LiqaaTech.ControllersMVC;
 
+import com.LiqaaTech.Security.Services.UserDetailsImpl;
 import com.LiqaaTech.Services.Interf.TicketService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,26 +23,34 @@ public class TicketMVCController {
     }
 
     @GetMapping
-    public String showTicketsPage(Model model) {
-        model.addAttribute("tickets", ticketService.getAllTickets());
+    public String listTickets(Model model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            model.addAttribute("tickets", ticketService.getTicketsByUserId(userDetails.getId()));
+        } else {
+            model.addAttribute("tickets", ticketService.getAllTickets());
+        }
         return "tickets/list";
     }
 
-    @GetMapping("/{id}")
-    public String showTicketDetails(@PathVariable Long id, Model model) {
-        model.addAttribute("ticket", ticketService.getTicketById(id));
-        return "tickets/details";
-    }
-
     @GetMapping("/event/{eventId}")
-    public String showEventTickets(@PathVariable Long eventId, Model model) {
+    public String listEventTickets(@PathVariable Long eventId, Model model) {
         model.addAttribute("tickets", ticketService.getTicketsByEventId(eventId));
+        model.addAttribute("eventId", eventId);
         return "tickets/event-list";
     }
 
     @GetMapping("/user/{userId}")
-    public String showUserTickets(@PathVariable Long userId, Model model) {
-        model.addAttribute("tickets", ticketService.getTicketsByUserId(userId));
-        return "tickets/user-list";
+    public String listUserTickets(@PathVariable Long userId, Model model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            if (userDetails.getId().equals(userId)) {
+                model.addAttribute("tickets", ticketService.getTicketsByUserId(userId));
+                return "tickets/user-list";
+            }
+        }
+        return "redirect:/tickets";
     }
 } 

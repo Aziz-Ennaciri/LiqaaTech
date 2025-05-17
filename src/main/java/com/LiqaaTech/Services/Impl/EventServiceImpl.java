@@ -1,88 +1,125 @@
 package com.LiqaaTech.Services.Impl;
 
-import com.LiqaaTech.DTOs.EventDTO;
 import com.LiqaaTech.Entities.Event;
-import com.LiqaaTech.Entities.User;
-import com.LiqaaTech.Mappers.EventMapper;
+import com.LiqaaTech.Exceptions.NotFoundException;
+import com.LiqaaTech.Repositories.CategoryRepository;
 import com.LiqaaTech.Repositories.EventRepository;
+import com.LiqaaTech.Repositories.UserRepository;
 import com.LiqaaTech.Services.Interf.EventService;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
-@Transactional
 public class EventServiceImpl implements EventService {
-    private final EventMapper eventMapper;
     private final EventRepository eventRepository;
+    private final CategoryRepository categoryRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public EventServiceImpl(EventMapper eventMapper, EventRepository eventRepository) {
-        this.eventMapper = eventMapper;
+    public EventServiceImpl(
+            EventRepository eventRepository,
+            CategoryRepository categoryRepository,
+            UserRepository userRepository) {
         this.eventRepository = eventRepository;
+        this.categoryRepository = categoryRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
-    public EventDTO createEvent(EventDTO eventDTO) {
-        Event event = eventMapper.toEntity(eventDTO);
+    public List<Event> getAllEvents() {
+        return eventRepository.findAll();
+    }
+
+    @Override
+    public Page<Event> getAllEvents(Pageable pageable) {
+        return eventRepository.findAll(pageable);
+    }
+
+    @Override
+    public Event getEventById(Long id) {
+        return eventRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Event not found with id: " + id));
+    }
+
+    @Override
+    public Event createEvent(Event event) {
+        // Validate required fields
+        if (event.getTitle() == null || event.getTitle().trim().isEmpty()) {
+            throw new IllegalArgumentException("Event title is required");
+        }
+        if (event.getDateTime() == null) {
+            throw new IllegalArgumentException("Event date and time are required");
+        }
+        if (event.getCapacity() == null || event.getCapacity() <= 0) {
+            throw new IllegalArgumentException("Event capacity must be greater than 0");
+        }
+        if (event.getCategory() == null || event.getCategory().getId() == null) {
+            throw new IllegalArgumentException("Event category is required");
+        }
+        if (event.getOrganizer() == null || event.getOrganizer().getId() == null) {
+            throw new IllegalArgumentException("Event organizer is required");
+        }
         
-        if (eventDTO.getOrganizerId() != null) {
-            User organizer = new User();
-            organizer.setId(eventDTO.getOrganizerId());
-            event.setOrganizer(organizer);
+        // Validate event date
+        if (event.getDateTime().isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Event date must be in the future");
         }
-
-        Event savedEvent = eventRepository.save(event);
-        return eventMapper.toDTO(savedEvent);
+        
+        // Set default values
+        event.setDeleted(false);
+        
+        // Set category and organizer references
+        event.setCategory(categoryRepository.findById(event.getCategory().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Category not found")));
+        event.setOrganizer(userRepository.findById(event.getOrganizer().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Organizer not found")));
+        
+        // Save event
+        return eventRepository.save(event);
     }
 
     @Override
-    public EventDTO updateEvent(Long eventId, EventDTO eventDTO) {
-        Event existingEvent = eventRepository.findById(eventId)
-                .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + eventId));
+    public Event updateEvent(Long id, Event event) {
+        Event existingEvent = eventRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Event not found with id: " + id));
 
-        existingEvent.setTitle(eventDTO.getTitle());
-        existingEvent.setLocation(eventDTO.getLocation());
-        existingEvent.setDescription(eventDTO.getDescription());
-        existingEvent.setStartDateTime(eventDTO.getStartDateTime());
-        existingEvent.setEndDateTime(eventDTO.getEndDateTime());
-        existingEvent.setImageUrl(eventDTO.getImageUrl());
-        existingEvent.setIsActive(eventDTO.getIsActive());
-        existingEvent.setCapacity(eventDTO.getCapacity());
-        existingEvent.setPrice(eventDTO.getPrice());
+        // Update all fields except ID and deleted status
+        existingEvent.setTitle(event.getTitle());
+        existingEvent.setDescription(event.getDescription());
+        existingEvent.setDateTime(event.getDateTime());
+        existingEvent.setCategory(event.getCategory());
+        existingEvent.setOrganizer(event.getOrganizer());
+        
+        return eventRepository.save(existingEvent);
+    }
 
-        if (eventDTO.getOrganizerId() != null) {
-            User organizer = new User();
-            organizer.setId(eventDTO.getOrganizerId());
-            existingEvent.setOrganizer(organizer);
+    @Override
+    public Page<Event> findAllEvents(Pageable pageable) {
+        return eventRepository.findAll(pageable);
+    }
+
+    @Override
+    public Page<Event> getEventsByCategory(Long categoryId, Pageable pageable) {
+        return eventRepository.findByCategoryId(categoryId, pageable);
+    }
+
+    @Override
+    public List<Event> getUpcomingEvents() {
+        return eventRepository.findUpcomingEvents(LocalDateTime.now());
+    }
+
+    @Override
+    public void deleteEvent(Long id) {
+        if (!eventRepository.existsById(id)) {
+            throw new NotFoundException("Event not found with id: " + id);
         }
-
-        Event updatedEvent = eventRepository.save(existingEvent);
-        return eventMapper.toDTO(updatedEvent);
+        eventRepository.deleteById(id);
     }
-
-    @Override
-    public void deleteEvent(Long eventId) {
-        Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + eventId));
-        eventRepository.delete(event);
-    }
-
-    @Override
-    public EventDTO getEventById(Long eventId) {
-        Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + eventId));
-        return eventMapper.toDTO(event);
-    }
-
-    @Override
-    public List<EventDTO> getAllEvents() {
-        return eventRepository.findAll().stream()
-                .map(eventMapper::toDTO)
-                .collect(Collectors.toList());
+    public Event save(Event event) {
+        return eventRepository.save(event);
     }
 }

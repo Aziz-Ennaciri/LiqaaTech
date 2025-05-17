@@ -14,7 +14,6 @@ public class CategoryMapper {
         if (category == null) {
             return null;
         }
-
         return CategoryDTO.builder()
                 .id(category.getId())
                 .name(category.getName())
@@ -22,16 +21,23 @@ public class CategoryMapper {
                 .build();
     }
 
-    public Category toEntity(CategoryDTO categoryDTO) {
-        if (categoryDTO == null) {
+    public Category toEntity(CategoryDTO dto) {
+        if (dto == null) {
             return null;
         }
-
         Category category = new Category();
-        category.setId(categoryDTO.getId());
-        category.setName(categoryDTO.getName());
-        category.setDescription(categoryDTO.getDescription());
+        category.setId(dto.getId());
+        category.setName(dto.getName());
+        category.setDescription(dto.getDescription());
         return category;
+    }
+
+    public void updateEntityFromDTO(CategoryDTO dto, Category category) {
+        if (dto == null || category == null) {
+            return;
+        }
+        category.setName(dto.getName());
+        category.setDescription(dto.getDescription());
     }
 
     public List<CategoryDTO> toDTOList(List<Category> categories) {
@@ -40,6 +46,15 @@ public class CategoryMapper {
         }
         return categories.stream()
                 .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<Category> toEntityList(List<CategoryDTO> dtos) {
+        if (dtos == null) {
+            return null;
+        }
+        return dtos.stream()
+                .map(this::toEntity)
                 .collect(Collectors.toList());
     }
 } 

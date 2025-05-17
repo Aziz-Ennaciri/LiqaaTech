@@ -1,46 +1,71 @@
 package com.LiqaaTech.Services.Impl;
 
-import com.LiqaaTech.DTOs.CategoryDTO;
 import com.LiqaaTech.Entities.Category;
 import com.LiqaaTech.Exceptions.NotFoundException;
-import com.LiqaaTech.Mappers.CategoryMapper;
 import com.LiqaaTech.Repositories.CategoryRepository;
 import com.LiqaaTech.Services.Interf.CategoryService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
-@Transactional
 public class CategoryServiceImpl implements CategoryService {
 
-    private final CategoryRepository categoryRepository;
-    private final CategoryMapper categoryMapper;
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     @Override
-    public CategoryDTO createCategory(CategoryDTO categoryDTO) {
-        Category category = categoryMapper.toEntity(categoryDTO);
-        Category savedCategory = categoryRepository.save(category);
-        return categoryMapper.toDTO(savedCategory);
+    @Transactional(readOnly = true)
+    public List<Category> getAllCategories() {
+        return categoryRepository.findAll();
     }
 
     @Override
-    public CategoryDTO updateCategory(Long id, CategoryDTO categoryDTO) throws NotFoundException {
+    @Transactional(readOnly = true)
+    public Category getCategoryById(Long id) {
+        return categoryRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Category not found with id: " + id));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Category getCategoryByName(String name) {
+        return categoryRepository.findByName(name)
+                .orElseThrow(() -> new NotFoundException("Category not found with name: " + name));
+    }
+
+    @Override
+    @Transactional
+    public Category createCategory(Category category) {
+        if (categoryRepository.existsByName(category.getName())) {
+            throw new RuntimeException("Category with this name already exists");
+        }
+        category.setDeleted(false);
+        return categoryRepository.save(category);
+    }
+
+    @Override
+    @Transactional
+    public Category updateCategory(Long id, Category category) {
         Category existingCategory = categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Category not found with id: " + id));
         
-        existingCategory.setName(categoryDTO.getName());
-        existingCategory.setDescription(categoryDTO.getDescription());
+        if (!existingCategory.getName().equals(category.getName()) && 
+            categoryRepository.existsByName(category.getName())) {
+            throw new RuntimeException("Category with this name already exists");
+        }
         
-        Category updatedCategory = categoryRepository.save(existingCategory);
-        return categoryMapper.toDTO(updatedCategory);
+        existingCategory.setName(category.getName());
+        existingCategory.setDescription(category.getDescription());
+        
+        return categoryRepository.save(existingCategory);
     }
 
     @Override
-    public void deleteCategory(Long id) throws NotFoundException {
+    @Transactional
+    public void deleteCategory(Long id) {
         if (!categoryRepository.existsById(id)) {
             throw new NotFoundException("Category not found with id: " + id);
         }
@@ -48,16 +73,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryDTO getCategoryById(Long id) throws NotFoundException {
-        Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Category not found with id: " + id));
-        return categoryMapper.toDTO(category);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<CategoryDTO> getAllCategories() {
-        List<Category> categories = categoryRepository.findAll();
-        return categoryMapper.toDTOList(categories);
+    public Category save(Category category) {
+        return categoryRepository.save(category);
     }
 } 

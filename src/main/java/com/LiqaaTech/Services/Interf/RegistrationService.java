@@ -5,11 +5,15 @@ import com.LiqaaTech.DTOs.RegistrationDTO;
 import java.util.List;
 
 public interface RegistrationService {
-    RegistrationDTO createRegistration(RegistrationDTO registrationDTO);
     List<RegistrationDTO> getAllRegistrations();
-    RegistrationDTO getRegistrationById(Long registrationId);
-    RegistrationDTO updateRegistration(Long registrationId, RegistrationDTO registrationDTO);
-    void deleteRegistration(Long registrationId);
+    RegistrationDTO getRegistrationById(Long id);
+    RegistrationDTO createRegistration(RegistrationDTO registrationDTO);
+    RegistrationDTO updateRegistration(Long id, RegistrationDTO registrationDTO);
+    void deleteRegistration(Long id);
+    List<RegistrationDTO> getRegistrationsByUser(Long userId);
+    List<RegistrationDTO> getRegistrationsByEvent(Long eventId);
+    RegistrationDTO cancelRegistration(Long id);
     List<RegistrationDTO> getRegistrationsByEventId(Long eventId);
     List<RegistrationDTO> getRegistrationsByUserId(Long userId);
+    int getTotalRegistrations();
 }

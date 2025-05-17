@@ -19,18 +19,6 @@ public class RegistrationMVCController {
         this.registrationService = registrationService;
     }
 
-    @GetMapping
-    public String showRegistrationsPage(Model model) {
-        model.addAttribute("registrations", registrationService.getAllRegistrations());
-        return "registrations/list";
-    }
-
-    @GetMapping("/{id}")
-    public String showRegistrationDetails(@PathVariable Long id, Model model) {
-        model.addAttribute("registration", registrationService.getRegistrationById(id));
-        return "registrations/details";
-    }
-
     @GetMapping("/event/{eventId}")
     public String showEventRegistrations(@PathVariable Long eventId, Model model) {
         model.addAttribute("registrations", registrationService.getRegistrationsByEventId(eventId));

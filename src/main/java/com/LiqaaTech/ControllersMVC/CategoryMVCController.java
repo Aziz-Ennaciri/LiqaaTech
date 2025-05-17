@@ -1,12 +1,15 @@
 package com.LiqaaTech.ControllersMVC;
 
+import com.LiqaaTech.Entities.Category;
 import com.LiqaaTech.Services.Interf.CategoryService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/categories")
@@ -20,25 +23,73 @@ public class CategoryMVCController {
     }
 
     @GetMapping
-    public String showCategoriesPage(Model model) {
+    public String showCategories(Model model) {
         model.addAttribute("categories", categoryService.getAllCategories());
         return "categories/list";
     }
 
-    @GetMapping("/{id}")
-    public String showCategoryDetails(@PathVariable Long id, Model model) {
-        model.addAttribute("category", categoryService.getCategoryById(id));
-        return "categories/details";
+    @GetMapping("/create")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String showCreateForm(Model model) {
+        model.addAttribute("category", new Category());
+        return "category/create";
     }
 
-    @GetMapping("/create")
-    public String showCreateCategoryForm(Model model) {
-        return "categories/create";
+    @PostMapping("/create")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String createCategory(@Valid @ModelAttribute("category") Category category,
+                               BindingResult result,
+                               RedirectAttributes redirectAttributes) {
+        if (result.hasErrors()) {
+            return "category/create";
+        }
+
+        try {
+            categoryService.createCategory(category);
+            redirectAttributes.addFlashAttribute("success", "Category created successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "category/create";
+        }
+
+        return "redirect:/categories";
     }
 
     @GetMapping("/edit/{id}")
-    public String showEditCategoryForm(@PathVariable Long id, Model model) {
-        model.addAttribute("category", categoryService.getCategoryById(id));
-        return "categories/edit";
+    public String showEditForm(@PathVariable Long id, Model model) {
+        Category category = categoryService.getCategoryById(id);
+        model.addAttribute("category", category);
+        return "category/edit";
+    }
+
+    @PostMapping("/edit/{id}")
+    public String updateCategory(@PathVariable Long id,
+                               @Valid @ModelAttribute("category") Category category,
+                               BindingResult result,
+                               RedirectAttributes redirectAttributes) {
+        if (result.hasErrors()) {
+            return "category/edit";
+        }
+
+        try {
+            categoryService.updateCategory(id, category);
+            redirectAttributes.addFlashAttribute("success", "Category updated successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "category/edit";
+        }
+
+        return "redirect:/categories";
+    }
+
+    @PostMapping("/delete/{id}")
+    public String deleteCategory(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            categoryService.deleteCategory(id);
+            redirectAttributes.addFlashAttribute("success", "Category deleted successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/categories";
     }
 } 

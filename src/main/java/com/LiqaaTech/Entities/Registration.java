@@ -1,65 +1,42 @@
 package com.LiqaaTech.Entities;
 
-import com.LiqaaTech.Enums.AttendanceStatus;
+import com.LiqaaTech.Enums.RegistrationStatus; // Using the correct enum from Enums package
 import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
-@Getter
-@Setter
 @Entity
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "registrations")
-@SQLDelete(sql = "UPDATE registrations SET deleted = true WHERE id=?")
-@Where(clause = "deleted=false")
+@Data
 public class Registration extends EntityBase {
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "participant_id", nullable = false)
-    private User participant;
+    @JoinColumn(name = "user_id", nullable = false)
+    @NotNull
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id", nullable = false)
+    @NotNull
     private Event event;
 
-    @Column(name = "registered_at", nullable = false)
-    private LocalDateTime registeredAt;
+    @Column(name = "registration_date", nullable = false)
+    private LocalDateTime registrationDate;
 
-    @Column(name = "in_waiting_list", nullable = false)
-    private boolean inWaitingList = false;
-
-    @OneToOne(mappedBy = "registration", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Ticket ticket;
-
-    @Column(nullable = false)
-    private boolean deleted = false;
-
-    @Column(name = "attendance_status")
+    @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
-    private AttendanceStatus attendanceStatus;
+    private RegistrationStatus status = RegistrationStatus.PENDING;
 
-    @Column(name = "check_in_time")
-    private LocalDateTime checkInTime;
+    @OneToMany(mappedBy = "registration", cascade = CascadeType.ALL)
+    private Set<Ticket> tickets = new HashSet<>();
 
-    public void setTicket(Ticket ticket) {
-        if (ticket != null) {
-            ticket.setRegistration(this);
-        }
-        this.ticket = ticket;
-    }
-
+    @PrePersist
     protected void onCreate() {
-        super.onCreate();
-        if (registeredAt == null) {
-            registeredAt = LocalDateTime.now();
-        }
-        if (attendanceStatus == null) {
-            attendanceStatus = AttendanceStatus.REGISTERED;
+        if (this.registrationDate == null) {
+            this.registrationDate = LocalDateTime.now();
         }
     }
 }

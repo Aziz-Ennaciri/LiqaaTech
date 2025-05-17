@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>My Tickets - LiqaaTech</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="text-center mb-8">
+                <h1 class="text-2xl sm:text-3xl font-semibold text-gray-900 dark:text-white mb-4">
+                    My Tickets
+                </h1>
+                <p class="text-gray-600 dark:text-gray-300 text-sm">
+                    View and manage your event tickets
+                </p>
+            </div>
+
+            <div class="space-y-6">
+                <div th:if="${#lists.isEmpty(tickets)}" class="text-center py-12">
+                    <p class="text-gray-600 dark:text-gray-300">
+                        You haven't registered for any events yet.
+                    </p>
+                    <a th:href="@{/events}" 
+                       class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+                        Browse Events
+                    </a>
+                </div>
+
+                <div th:unless="${#lists.isEmpty(tickets)}" class="space-y-4">
+                    <div th:each="ticket : ${tickets}" class="bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                                    <span th:text="${ticket.event.title}">Event Title</span>
+                                </h3>
+                                <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
+                                    <span th:text="${#temporals.format(ticket.event.dateTime, 'MMM d, yyyy h:mm a')}">May 15, 2025 5:00 PM</span>
+                                </p>
+                                <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
+                                    <span th:text="${ticket.event.location}">Event Location</span>
+                                </p>
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                <span th:if="${ticket.status == 'PENDING'}" 
+                                      class="px-2 py-1 text-xs font-medium text-yellow-800 bg-yellow-100 dark:bg-yellow-900 rounded-full">
+                                    Pending
+                                </span>
+                                <span th:if="${ticket.status == 'CONFIRMED'}" 
+                                      class="px-2 py-1 text-xs font-medium text-green-800 bg-green-100 dark:bg-green-900 rounded-full">
+                                    Confirmed
+                                </span>
+                                <span th:if="${ticket.status == 'CANCELLED'}" 
+                                      class="px-2 py-1 text-xs font-medium text-red-800 bg-red-100 dark:bg-red-900 rounded-full">
+                                    Cancelled
+                                </span>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex justify-end">
+                            <a th:href="@{/events/{id}(id=${ticket.event.id})}" 
+                               class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-indigo-100 dark:bg-indigo-900 hover:bg-indigo-200 dark:hover:bg-indigo-800">
+                                View Event
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
