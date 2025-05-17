@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Controller
 @RequestMapping("/auth")
@@ -30,9 +32,20 @@ public class AuthMVCController {
     }
 
     @GetMapping("/login")
-    public String showLoginPage(Model model) {
+    public String showLoginPage(Model model, HttpServletRequest request) {
         model.addAttribute("loginRequest", new LoginRequest());
+        model.addAttribute("currentUrl", request.getRequestURI());
         return "auth/login";
+    }
+
+    @GetMapping("/profile")
+    public String showProfile(Model model) {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof UserDetails) {
+            String email = ((UserDetails) principal).getUsername();
+            model.addAttribute("user", userService.getUserByEmail(email));
+        }
+        return "users/profile";
     }
 
     @GetMapping("/register")

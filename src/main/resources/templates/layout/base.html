@@ -34,25 +34,25 @@
                         </a>
                     </div>
                      <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-                        <a th:href="@{/events}" 
+                        <a th:href="@{/events}"
                            class="inline-flex items-center px-1 pt-1 border-b-2 text-gray-900 dark:text-white"
-                           th:classappend="${#httpServletRequest.getRequestURI().startsWith('/events') ? 'border-indigo-500' : 'border-transparent hover:border-gray-300 dark:hover:border-gray-600 text-gray-500 dark:text-gray-300'}">
+                           th:classappend="${currentUrl.startsWith('/events')} ? 'border-indigo-500' : 'border-transparent hover:border-gray-300 dark:hover:border-gray-600 text-gray-500 dark:text-gray-300'">
                             Events
                         </a>
-                        <a th:href="@{/categories}" 
+                        <a th:href="@{/categories}"
                            class="inline-flex items-center px-1 pt-1 border-b-2 text-gray-900 dark:text-white"
-                           th:classappend="${#httpServletRequest.getRequestURI().startsWith('/categories') ? 'border-indigo-500' : 'border-transparent hover:border-gray-300 dark:hover:border-gray-600 text-gray-500 dark:text-gray-300'}">
+                           th:classappend="${currentUrl.startsWith('/categories')} ? 'border-indigo-500' : 'border-transparent hover:border-gray-300 dark:hover:border-gray-600 text-gray-500 dark:text-gray-300'">
                             Categories
                         </a>
-                        <a th:href="@{/tickets}" 
+                        <a th:href="@{/tickets}"
                            class="inline-flex items-center px-1 pt-1 border-b-2 text-gray-900 dark:text-white"
-                           th:classappend="${#httpServletRequest.getRequestURI().startsWith('/tickets') ? 'border-indigo-500' : 'border-transparent hover:border-gray-300 dark:hover:border-gray-600 text-gray-500 dark:text-gray-300'}"
+                           th:classappend="${currentUrl.startsWith('/tickets')} ? 'border-indigo-500' : 'border-transparent hover:border-gray-300 dark:hover:border-gray-600 text-gray-500 dark:text-gray-300'"
                            sec:authorize="isAuthenticated()">
                             My Tickets
                         </a>
                         <a th:href="@{/about}" 
                            class="inline-flex items-center px-1 pt-1 border-b-2 text-gray-900 dark:text-white"
-                           th:classappend="${#httpServletRequest.getRequestURI().startsWith('/about') ? 'border-indigo-500' : 'border-transparent hover:border-gray-300 dark:hover:border-gray-600 text-gray-500 dark:text-gray-300'}">
+                           th:classappend="${currentUrl.startsWith('/about')} ? 'border-indigo-500' : 'border-transparent hover:border-gray-300 dark:hover:border-gray-600 text-gray-500 dark:text-gray-300'">
                             About Us
                         </a>
                     </div>
@@ -61,11 +61,12 @@
                 <div class="hidden sm:ml-6 sm:flex sm:items-center">
                     <div class="ml-3 relative">
                         <div class="flex items-center space-x-4">
-                            <a th:href="@{/users/profile}"
-                               class="text-gray-500 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
-                               sec:authorize="isAuthenticated()">
-                                <i class="fas fa-user-circle text-xl"></i>
-                            </a>
+                            <div sec:authorize="isAuthenticated()">
+                                <span class="text-gray-900 dark:text-white">
+                                    <i class="fas fa-user-circle text-xl mr-2"></i>
+                                    <span sec:authentication="name">User Name</span>
+                                </span>
+                            </div>
                             <form th:action="@{/auth/logout}" method="post" class="inline">
                                 <button type="submit" 
                                         class="text-gray-500 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"

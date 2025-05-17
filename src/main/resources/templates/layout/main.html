@@ -14,18 +14,16 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-
-
     <th:block layout:fragment="styles"></th:block>
 </head>
-<body class="bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 min-h-screen font-poppins">
+<body class="bg-white min-h-screen font-poppins">
     <!-- Navigation -->
-    <nav class="bg-white dark:bg-gray-900 shadow-lg">
+    <nav class="bg-white shadow-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <a href="/" class="text-primary dark:text-white text-2xl font-bold tracking-tight">LiqaaTech</a>
+                        <a href="/" class="text-primary text-2xl font-bold tracking-tight">LiqaaTech</a>
                     </div>
                     <div class="hidden md:block">
                         <div class="ml-10 flex items-baseline space-x-6">
@@ -37,14 +35,10 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-6">
-                    <!-- Dark Mode Toggle -->
-                    <button id="darkModeToggle" class="p-2 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" title="Toggle dark mode">
-                        <i id="darkModeIcon" class="fas fa-moon text-gray-600 dark:text-gray-300 text-lg"></i>
-                    </button>
                     <div class="hidden md:block">
                         <div class="ml-4 flex items-center md:ml-6">
                             <div th:if="${#authorization.expression('isAuthenticated()')}" class="flex items-center space-x-4">
-                                <span class="text-gray-700 dark:text-gray-200 font-medium" th:text="${#authentication.name}"></span>
+                                <span class="text-gray-700 font-medium" th:text="${#authentication.name}"></span>
                                 <form th:action="@{/auth/logout}" method="post" class="inline">
                                     <button type="submit" class="btn-secondary">Logout</button>
                                 </form>
@@ -73,7 +67,7 @@
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto py-8 sm:px-6 lg:px-8">
         <!-- Flash Messages -->
-        <div th:if="${successMessage}" class="success-message mb-6" role="alert">
+        <div th:if="${successMessage}" class="bg-green-50 border-l-4 border-green-400 p-4 mb-4 rounded-md shadow-sm" role="alert">
             <div class="flex">
                 <div class="flex-shrink-0">
                     <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -81,21 +75,21 @@
                     </svg>
                 </div>
                 <div class="ml-3">
-                    <p class="text-sm font-medium text-green-700 dark:text-green-300" th:text="${successMessage}"></p>
+                    <p class="text-sm font-medium text-green-700" th:text="${successMessage}"></p>
                 </div>
                 <div class="ml-auto pl-3">
                     <div class="-mx-1.5 -my-1.5">
-                        <button type="button" class="inline-flex rounded-md p-1.5 text-green-500 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-green-500" onclick="this.parentElement.parentElement.parentElement.remove()">
+                        <button type="button" class="inline-flex rounded-md p-1.5 text-green-500 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-green-500" onclick="this.parentElement.parentElement.parentElement.remove()">
                             <span class="sr-only">Dismiss</span>
                             <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 10-1.414-1.414L10 11.414l-4.293-4.293a1 1 0 00-1.414 1.414L8.586 10l-4.293 4.293a1 1 0 000 1.414z" clip-rule="evenodd" />
                             </svg>
                         </button>
                     </div>
                 </div>
             </div>
         </div>
-        <div th:if="${errorMessage}" class="error-message mb-6" role="alert">
+        <div th:if="${errorMessage}" class="bg-red-50 border-l-4 border-red-400 p-4 mb-4 rounded-md shadow-sm" role="alert">
             <div class="flex">
                 <div class="flex-shrink-0">
                     <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -103,14 +97,14 @@
                     </svg>
                 </div>
                 <div class="ml-3">
-                    <p class="text-sm font-medium text-red-700 dark:text-red-300" th:text="${errorMessage}"></p>
+                    <p class="text-sm font-medium text-red-700" th:text="${errorMessage}"></p>
                 </div>
                 <div class="ml-auto pl-3">
                     <div class="-mx-1.5 -my-1.5">
-                        <button type="button" class="inline-flex rounded-md p-1.5 text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-red-500" onclick="this.parentElement.parentElement.parentElement.remove()">
+                        <button type="button" class="inline-flex rounded-md p-1.5 text-red-500 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-red-500" onclick="this.parentElement.parentElement.parentElement.remove()">
                             <span class="sr-only">Dismiss</span>
                             <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 10-1.414-1.414L10 11.414l-4.293-4.293a1 1 0 00-1.414 1.414L8.586 10l-4.293 4.293a1 1 0 000 1.414z" clip-rule="evenodd" />
                             </svg>
                         </button>
                     </div>
@@ -125,20 +119,20 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-800 text-white mt-8">
+    <footer class="bg-gray-50 text-gray-600 mt-8">
         <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center">
                 <div>
-                    <p>&copy; 2025 LiqaaTech. All rights reserved.</p>
+                    <p class="text-sm">&copy; 2025 LiqaaTech. All rights reserved.</p>
                 </div>
                 <div class="flex space-x-6">
-                    <a href="#" class="text-gray-400 hover:text-white">
+                    <a href="#" class="text-gray-400 hover:text-gray-500">
                         <i class="fab fa-facebook"></i>
                     </a>
-                    <a href="#" class="text-gray-400 hover:text-white">
+                    <a href="#" class="text-gray-400 hover:text-gray-500">
                         <i class="fab fa-twitter"></i>
                     </a>
-                    <a href="#" class="text-gray-400 hover:text-white">
+                    <a href="#" class="text-gray-400 hover:text-gray-500">
                         <i class="fab fa-instagram"></i>
                     </a>
                 </div>
@@ -148,38 +142,8 @@
 
     <!-- JavaScript -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script th:inline="javascript">
-        // Dark mode toggle logic
-        const darkModeToggle = document.getElementById('darkModeToggle');
-        const darkModeIcon = document.getElementById('darkModeIcon');
-        function setDarkMode(enabled) {
-            if (enabled) {
-                document.documentElement.classList.add('dark');
-                localStorage.setItem('theme', 'dark');
-                darkModeIcon.classList.remove('fa-moon');
-                darkModeIcon.classList.add('fa-sun');
-            } else {
-                document.documentElement.classList.remove('dark');
-                localStorage.setItem('theme', 'light');
-                darkModeIcon.classList.remove('fa-sun');
-                darkModeIcon.classList.add('fa-moon');
-            }
-        }
-        // On load, set theme from localStorage
-        if (localStorage.getItem('theme') === 'dark' || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            setDarkMode(true);
-        } else {
-            setDarkMode(false);
-        }
-        darkModeToggle.addEventListener('click', function() {
-            setDarkMode(!document.documentElement.classList.contains('dark'));
-        });
-    </script>
-
-    <!-- Tailwind Dark Mode Config -->
     <script>
         tailwind.config = {
-            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
