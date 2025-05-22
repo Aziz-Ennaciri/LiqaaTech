@@ -21,8 +21,8 @@ public class UserMVCController {
         return "auth/profile";
     }
 
-    @GetMapping("/settings")
-    public String showSettingsPage(Model model) {
-        return "auth/settings";
+    @GetMapping("/dashboard")
+    public String showDashboardPage(Model model) {
+        return "user/dashboard";
     }
-} 
+}

@@ -1,0 +1,74 @@
+/* Smooth transitions */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Navigation */
+.nav-link {
+    @apply px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200;
+}
+
+.nav-link.active {
+    @apply bg-indigo-50 text-indigo-600;
+}
+
+/* Event cards */
+.event-card {
+    @apply transform transition-all duration-300 hover:scale-105;
+}
+
+.event-card:hover {
+    @apply shadow-xl;
+}
+
+/* Button animations */
+.btn-primary {
+    @apply transform transition-all duration-300;
+}
+
+.btn-primary:hover {
+    @apply scale-105;
+}
+
+/* Loading animations */
+.loading {
+    @apply animate-spin;
+}
+
+/* Flash messages */
+.flash-message {
+    @apply animate-fade-in;
+}
+
+@keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.animate-fade-in {
+    animation: fade-in 0.3s ease-out;
+}
+
+/* Skeleton loading */
+.skeleton {
+    @apply bg-gray-200 rounded-lg;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+}

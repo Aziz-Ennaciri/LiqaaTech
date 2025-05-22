@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,14 +33,15 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Override
     public List<RegistrationDTO> getAllRegistrations() {
-        return registrationRepository.findAll().stream()
+        return registrationRepository.findAllWithDetails().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public RegistrationDTO getRegistrationById(Long id) {
-        Registration registration = registrationRepository.findById(id)
+        Registration registration = registrationRepository.findByIdWithDetails(id)
                 .orElseThrow(() -> new EntityNotFoundException("Registration not found with id: " + id));
         return convertToDTO(registration);
     }
@@ -63,7 +65,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Override
     public RegistrationDTO updateRegistration(Long id, RegistrationDTO registrationDTO) {
-        Registration registration = registrationRepository.findById(id)
+        Registration registration = registrationRepository.findByIdWithDetails(id)
                 .orElseThrow(() -> new EntityNotFoundException("Registration not found with id: " + id));
 
         if (registrationDTO.getStatus() != null) {
@@ -83,28 +85,30 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<RegistrationDTO> getRegistrationsByUser(Long userId) {
         if (!userRepository.existsById(userId)) {
             throw new EntityNotFoundException("User not found with id: " + userId);
         }
-        return registrationRepository.findByUserId(userId).stream()
+        return registrationRepository.findByUserIdWithDetails(userId).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<RegistrationDTO> getRegistrationsByEvent(Long eventId) {
         if (!eventRepository.existsById(eventId)) {
             throw new EntityNotFoundException("Event not found with id: " + eventId);
         }
-        return registrationRepository.findByEventId(eventId).stream()
+        return registrationRepository.findByEventIdWithDetails(eventId).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
     public RegistrationDTO cancelRegistration(Long id) {
-        Registration registration = registrationRepository.findById(id)
+        Registration registration = registrationRepository.findByIdWithDetails(id)
                 .orElseThrow(() -> new EntityNotFoundException("Registration not found with id: " + id));
         
         registration.setStatus(RegistrationStatus.CANCELLED);

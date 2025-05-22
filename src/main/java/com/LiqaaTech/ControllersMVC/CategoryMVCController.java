@@ -28,6 +28,13 @@ public class CategoryMVCController {
         return "categories/list";
     }
 
+    @GetMapping("/{id}")
+    public String showCategoryDetails(@PathVariable Long id, Model model) {
+        Category category = categoryService.getCategoryById(id);
+        model.addAttribute("category", category);
+        return "categories/details";
+    }
+
     @GetMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
     public String showCreateForm(Model model) {

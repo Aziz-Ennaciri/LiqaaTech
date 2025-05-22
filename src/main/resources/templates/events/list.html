@@ -6,49 +6,62 @@
 <body>
 <div layout:fragment="content">
     <!-- Search and Filter Section -->
-    <div class="bg-white shadow-lg rounded-lg">
+    <div class="bg-white shadow-lg rounded-lg mb-8">
         <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-            <form th:action="@{/events}" method="get" class="space-y-4">
+            <form th:action="@{/all-events}" method="get" class="space-y-4">
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     <!-- Search -->
                     <div>
                         <label for="search" class="block text-sm font-medium text-gray-700">Search</label>
-                        <input type="text" name="search" id="search" th:value="${param.search}"
+                        <input type="text" name="search" id="search" th:value="${search}"
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Search events...">
                     </div>
                     
                     <!-- Category Filter -->
                     <div>
                         <label for="category" class="block text-sm font-medium text-gray-700">Category</label>
-                        <select name="category" id="category" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                        <select name="categoryId" id="category" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                             <option value="">All Categories</option>
                             <option th:each="cat : ${categories}"
                                     th:value="${cat.id}"
                                     th:text="${cat.name}"
-                                    th:selected="${param.category != null and param.category[0] == cat.id.toString()}">
+                                    th:selected="${selectedCategory != null and selectedCategory == cat.id}">
                             </option>
                         </select>
                     </div>
-                    
-                    <!-- Date Filter -->
-                    <div>
-                        <label for="date" class="block text-sm font-medium text-gray-700">Date</label>
-                        <select name="date" id="date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                            <option value="">Any Date</option>
-                            <option value="today" th:selected="${param.date != null and param.date[0] == 'today'}">Today</option>
-                            <option value="tomorrow" th:selected="${param.date != null and param.date[0] == 'tomorrow'}">Tomorrow</option>
-                            <option value="this-week" th:selected="${param.date != null and param.date[0] == 'this-week'}">This Week</option>
-                            <option value="this-month" th:selected="${param.date != null and param.date[0] == 'this-month'}">This Month</option>
-                        </select>
+                </div>
+                <div class="flex justify-end">
+                    <button type="submit" class="btn-primary px-6 py-2">Filter Events</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Events Grid -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div th:each="event : ${events}" class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">
+                        <th:block th:text="${event.title}">Event Title</th:block>
+                    </h3>
+                    <p class="text-gray-600 mb-4">
+                        <th:block th:text="${event.description}">Event description</th:block>
+                    </p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-500">
+                            <th:block th:text="${#temporals.format(event.startDate, 'MMM dd, yyyy HH:mm')}">Date</th:block>
+                        </span>
+                        <a th:href="@{/events/{id}(id=${event.id})}" class="text-blue-600 hover:text-blue-700">
+                            View Details →
+                        </a>
                     </div>
-                    
-                    <!-- Price Filter -->
-                    <div>
-                        <label for="price" class="block text-sm font-medium text-gray-700">Price Range</label>
-                        <select name="price" id="price" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                            <option value="">Any Price</option>
-                            <option value="free" th:selected="${param.price != null and param.price[0] == 'free'}">Free</option>
-                            <option value="paid" th:selected="${param.price != null and param.price[0] == 'paid'}">Paid</option>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
                         </select>
                     </div>
                 </div>
@@ -67,7 +80,7 @@
         <!-- Results Count -->
         <div class="mb-6">
             <p class="text-gray-600">
-                Showing <span class="font-semibold" th:text="${events.totalElements}">0</span> events
+                Showing <span class="font-semibold" th:text="${eventsPage.totalElements}">0</span> events
                 <span th:if="${param.search != null or param.category != null or param.date != null or param.price != null}">
                     matching your filters
                 </span>
@@ -75,26 +88,26 @@
         </div>
 
         <!-- Events Grid -->
-        <div class="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            <div th:each="event : ${events}" class="bg-white rounded-lg shadow-lg overflow-hidden group hover:shadow-xl transition-shadow duration-200">
+        <div class="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" data-aos="fade-up" data-aos-duration="800">
+            <div th:each="event : ${events}" class="bg-white rounded-lg shadow-lg overflow-hidden group hover:shadow-xl transition-all duration-300 event-card">
                 <div class="p-6">
-                    <div class="flex justify-between items-start mb-4">
+                    <div class="flex justify-between items-start mb-4 transition-all duration-300">
                         <div class="flex items-center text-sm text-gray-500">
                             <i class="far fa-calendar-alt mr-2"></i>
-                            <span th:text="${#temporals.format(event.dateTime, 'MMM dd, yyyy HH:mm')}"></span>
+                            <span th:text="${#temporals.format(event.startDateTime, 'MMM dd, yyyy HH:mm')}"></span>
                         </div>
                         <div class="bg-accent text-white px-3 py-1 rounded-full text-sm">
                             <span th:text="${event.availableSpots} + ' spots left'"></span>
                         </div>
                     </div>
-                    <h3 class="text-xl font-semibold text-gray-900 mb-2" th:text="${event.title}"></h3>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2 group-hover:text-primary transition-colors duration-300" th:text="${event.title}"></h3>
                     <p class="text-gray-600 mb-4" th:text="${#strings.abbreviate(event.description, 100)}"></p>
-                    <div class="flex items-center text-sm text-gray-500 mb-4">
+                    <div class="flex items-center text-sm text-gray-500 mb-4 transition-colors duration-300">
                         <i class="fas fa-map-marker-alt mr-2"></i>
                         <span th:text="${event.location}"></span>
                     </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-2xl font-bold text-primary" th:text="${'$' + event.ticketPrice}"></span>
+                    <div class="flex justify-between items-center transition-all duration-300">
+                            <span class="text-2xl font-bold text-primary" th:text="${'$' + event.price}"></span>
                         <a th:href="@{/events/{id}(id=${event.id})}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                             View Details
                         </a>
@@ -104,23 +117,23 @@
         </div>
 
         <!-- Pagination -->
-        <div class="mt-8" th:if="${events.totalPages > 1}">
+        <div class="mt-8" th:if="${eventsPage.totalPages > 1}">
             <nav class="flex justify-center">
                 <ul class="flex space-x-2">
                     <!-- Previous Page -->
-                    <li th:classappend="${events.first} ? 'opacity-50 cursor-not-allowed' : ''">
-                        <a th:href="@{/events(page=${events.number - 1}, size=${events.size}, search=${param.search}, category=${param.category}, date=${param.date}, price=${param.price})}"
+                    <li th:classappend="${eventsPage.first} ? 'opacity-50 cursor-not-allowed' : ''">
+                        <a th:href="@{/events(page=${eventsPage.number - 1}, size=${eventsPage.size}, search=${param.search}, category=${param.category}, date=${param.date}, price=${param.price})}"
                            class="inline-flex items-center px-3 py-2 rounded-md bg-white text-gray-700 hover:bg-gray-50 transition-colors duration-200"
-                           th:classappend="${events.first} ? 'pointer-events-none' : ''">
+                           th:classappend="${eventsPage.first} ? 'pointer-events-none' : ''">
                             <i class="fas fa-chevron-left"></i>
                         </a>
                     </li>
                     
                     <!-- Page Numbers -->
-                    <li th:each="i : ${#numbers.sequence(0, events.totalPages - 1)}">
-                        <a th:href="@{/events(page=${i}, size=${events.size}, search=${param.search}, category=${param.category}, date=${param.date}, price=${param.price})}"
+                    <li th:each="i : ${#numbers.sequence(0, eventsPage.totalPages - 1)}">
+                        <a th:href="@{/events(page=${i}, size=${eventsPage.size}, search=${param.search}, category=${param.category}, date=${param.date}, price=${param.price})}"
                            class="inline-flex items-center px-3 py-2 rounded-md transition-colors duration-200"
-                           th:classappend="${i == events.number} ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'"
+                           th:classappend="${i == eventsPage.number} ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'"
                            th:text="${i + 1}">
                         </a>
                     </li>

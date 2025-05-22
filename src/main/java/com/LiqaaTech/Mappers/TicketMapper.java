@@ -29,7 +29,7 @@ public class TicketMapper {
                 .createdAt(ticket.getCreatedAt())
                 .updatedAt(ticket.getUpdatedAt())
                 .eventName(ticket.getEvent() != null ? ticket.getEvent().getTitle() : null)
-                .eventDate(ticket.getEvent() != null ? ticket.getEvent().getDateTime() : null)
+                .eventDate(ticket.getEvent() != null ? ticket.getEvent().getStartDateTime() : null)
                 .build();
     }
 

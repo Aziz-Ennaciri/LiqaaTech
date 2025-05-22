@@ -18,8 +18,8 @@ public class EventCreateDTO {
     private String description;
 
     @NotNull(message = "Date and time is required")
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
-    private LocalDateTime dateTime;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm")
+    private LocalDateTime startDateTime;
 
     @NotBlank(message = "Location is required")
     private String location;
@@ -31,8 +31,8 @@ public class EventCreateDTO {
     @NotNull(message = "Price is required")
     private BigDecimal price;
 
-    private Long category;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm")
+    private LocalDateTime endDateTime;
 
-    @NotNull(message = "Organizer is required")
-    private Long organizer;
+    private Long category;
 }

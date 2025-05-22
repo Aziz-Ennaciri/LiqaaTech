@@ -21,10 +21,13 @@ const formatCurrency = (amount) => {
     }).format(amount);
 };
 
-// Modal Handling
-const openModal = (modalId) => {
-    document.getElementById(modalId).classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
+// DOM Elements
+const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+const mobileMenu = document.getElementById('mobile-menu');
+const searchInput = document.getElementById('search');
+const categorySelect = document.getElementById('category');
+const dateSelect = document.getElementById('date');
+const priceSelect = document.getElementById('price');
 };
 
 const closeModal = (modalId) => {

@@ -1,0 +1,72 @@
+:root {
+    --category-bg: #1e40af;
+    --category-hover-bg: #1a3668;
+    --category-text: #ffffff;
+    --category-icon-bg: rgba(255, 255, 255, 0.1);
+    --category-icon-color: #ffffff;
+}
+
+.category-card {
+    background-color: var(--category-bg);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.category-card:hover {
+    background-color: var(--category-hover-bg);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+}
+
+.category-card .category-icon {
+    width: 48px;
+    height: 48px;
+    background-color: var(--category-icon-bg);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.category-card .category-icon i {
+    font-size: 1.5rem;
+    color: var(--category-icon-color);
+}
+
+.category-card h3 {
+    color: var(--category-text);
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.category-card p {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.category-card a {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--category-text);
+    border-radius: 0.5rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.category-card a:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    transform: translateX(2px);
+}
+
+.category-card a i {
+    margin-right: 0.5rem;
+    font-size: 0.9rem;
+}

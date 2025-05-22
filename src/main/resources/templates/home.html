@@ -1,84 +1,76 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/main}">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout/main">
 <head>
-    <title>Home - LiqaaTech</title>
+    <title>LiqaaTech - Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body>
-<div layout:fragment="content">
+<body class="font-sans antialiased">
+     <div layout:fragment="content">
     <!-- Hero Section -->
-    <section class="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
-        <div class="absolute inset-0">
-            <img class="w-full h-full object-cover blur-sm scale-105" src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=1500&q=80" alt="Event background">
-            <div class="absolute inset-0 bg-gradient-to-br from-primary/90 via-indigo-700/80 to-blue-500/80"></div>
-        </div>
-        <div class="relative z-10 max-w-2xl mx-auto text-center py-20 px-6">
-            <div class="backdrop-blur-lg bg-white/20 rounded-3xl shadow-2xl p-10 border border-white/30">
-                <h1 class="text-5xl md:text-6xl font-extrabold text-white drop-shadow mb-6">Welcome to <span class="text-accent">LiqaaTech</span></h1>
-                <p class="text-xl md:text-2xl text-white/90 mb-8 font-light tracking-wide">Your platform for creating and managing events</p>
-                <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <a href="/events" class="btn-primary text-lg px-8 py-3 shadow-lg">Browse Events</a>
-                    <a href="/events/create" class="btn-secondary text-lg px-8 py-3 shadow-lg">Create Event</a>
+    <section class="relative min-h-[60vh] flex items-center justify-center overflow-hidden bg-white">
+        <div class="relative z-10 max-w-4xl mx-auto text-center px-6">
+            <div class="bg-white rounded-xl p-8 shadow-2xl hover:shadow-xl transition-shadow duration-300">
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                    Welcome to LiqaaTech
+                </h1>
+                <p class="text-xl md:text-2xl text-gray-600 mb-8">
+                    Discover amazing events and experiences near you. Join our community and create unforgettable moments.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <a href="/events" class="btn-primary px-6 py-3">
+                        Browse Events
+                    </a>
+                    <a href="/auth/register" class="btn-secondary px-6 py-3">
+                        Join Now
+                    </a>
                 </div>
-            </div>
-        </div>
-        <!-- Curved SVG Divider -->
-        <div class="absolute bottom-0 left-0 w-full overflow-hidden leading-none rotate-180" style="height: 80px;">
-            <svg viewBox="0 0 500 80" preserveAspectRatio="none" class="w-full h-full">
-                <path d="M0,80 C150,0 350,0 500,80 L500,00 L0,0 Z" fill="#fff" fill-opacity="1"></path>
-            </svg>
-        </div>
-    </section>
-
-    <!-- Featured Events -->
-    <section class="bg-white py-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <h2 class="text-4xl font-extrabold text-gray-900">Featured Events</h2>
-                <p class="mt-3 max-w-2xl mx-auto text-xl text-gray-500">Check out our most popular upcoming events</p>
-            </div>
-            <div class="mt-12 grid gap-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                <div th:each="event : ${featuredEvents}" class="card group p-0 hover:scale-105 transition-transform duration-200">
-                    <div class="relative">
-                        <img th:src="${event.imageUrl}" th:alt="${event.title}" class="w-full h-56 object-cover rounded-t-3xl">
-                        <div class="absolute top-4 right-4 bg-accent text-white px-3 py-1 rounded-full text-sm shadow">
-                            <span th:text="${event.availableSpots} + ' spots left'"></span>
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <div class="flex items-center text-sm text-gray-500 mb-2">
-                            <i class="far fa-calendar-alt mr-2"></i>
-                            <span th:text="${#temporals.format(event.startDateTime, 'MMM dd, yyyy')}"></span>
-                        </div>
-                        <h3 class="text-2xl font-bold text-gray-900 mb-2" th:text="${event.title}"></h3>
-                        <p class="text-gray-600 mb-4" th:text="${#strings.abbreviate(event.description, 100)}"></p>
-                        <div class="flex justify-between items-center">
-                            <span class="text-2xl font-bold text-primary" th:text="${'$' + event.ticketPrice}"></span>
-                            <a th:href="@{/events/{id}(id=${event.id})}" class="btn-primary btn-sm">View Details</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="text-center mt-12">
-                <a href="/events" class="btn-secondary text-lg px-8 py-3">View All Events</a>
             </div>
         </div>
     </section>
 
-    <!-- Categories -->
-    <section class="bg-gray-50 py-16">
+    <!-- Categories Section -->
+    <section class="py-12 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <h2 class="text-4xl font-extrabold text-gray-900">Event Categories</h2>
-                <p class="mt-3 max-w-2xl mx-auto text-xl text-gray-500">Explore events by category</p>
+            <div class="text-center mb-8">
+                <h2 class="text-2xl font-semibold text-gray-900 mb-2">
+                    Event Categories
+                </h2>
+                <p class="text-gray-600">
+                    Explore events by category
+                </p>
             </div>
-            <div class="mt-12 grid gap-10 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
-                <div th:each="category : ${categories}" class="card group p-6 hover:scale-105 transition-transform duration-200">
-                    <a th:href="@{/events/category/{id}(id=${category.id})}" class="block text-center">
-                        <div class="w-20 h-20 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center group-hover:bg-accent transition-colors duration-200">
-                            <i class="fas fa-music text-3xl text-primary group-hover:text-white"></i>
-                        </div>
-                        <h3 class="text-xl font-bold text-gray-900" th:text="${category.name}"></h3>
-                        <p class="mt-2 text-base text-gray-500" th:text="${#strings.abbreviate(category.description, 60)}"></p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">
+                        Technology
+                    </h3>
+                    <p class="text-gray-600 mb-4">
+                        Events related to technology, software, and innovation
+                    </p>
+                    <a href="/events?category=Technology" class="text-blue-600 hover:text-blue-700">
+                        View Events →
+                    </a>
+                </div>
+                <div class="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">
+                        Business
+                    </h3>
+                    <p class="text-gray-600 mb-4">
+                        Professional development and networking events
+                    </p>
+                    <a href="/events?category=Business" class="text-blue-600 hover:text-blue-700">
+                        View Events →
+                    </a>
+                </div>
+                <div class="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">
+                        Arts & Culture
+                    </h3>
+                    <p class="text-gray-600 mb-4">
+                        Creative and cultural events
+                    </p>
+                    <a href="/events?category=Arts%20Culture" class="text-blue-600 hover:text-blue-700">
+                        View Events →
                     </a>
                 </div>
             </div>
@@ -86,18 +78,18 @@
     </section>
 
     <!-- Call to Action -->
-    <section class="bg-gradient-to-r from-primary via-indigo-500 to-blue-400 py-16">
+    <section class="py-16 bg-gray-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-center justify-between">
-            <h2 class="text-3xl font-extrabold tracking-tight text-white mb-6 lg:mb-0">
+            <h2 class="text-3xl font-extrabold text-gray-900 mb-6 lg:mb-0">
                 <span class="block">Ready to create your own event?</span>
-                <span class="block text-accent">Start organizing today.</span>
+                <span class="block">Start organizing today.</span>
             </h2>
             <div class="flex gap-4">
-                <a href="/events/create" class="btn-primary text-lg px-8 py-3">Create Event</a>
-                <a href="/events" class="btn-secondary text-lg px-8 py-3">Browse Events</a>
+                <a th:href="@{/events/create}" class="btn-primary text-lg px-8 py-3">Create Event</a>
+                <a th:href="@{/events}" class="btn-secondary text-lg px-8 py-3">Browse Events</a>
             </div>
         </div>
     </section>
-</div>
+    </div>
 </body>
 </html>

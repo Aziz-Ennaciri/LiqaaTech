@@ -14,10 +14,13 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.access.AccessDeniedHandlerImpl;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import java.util.Arrays;
 
@@ -55,10 +58,9 @@ public class SecurityConfig {
                 .ignoringRequestMatchers("/auth/**")
             )
             .authorizeHttpRequests(auth -> auth
-                // Public endpoints
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/test/**").permitAll()
                 .requestMatchers("/").permitAll()
+                .requestMatchers("/home").permitAll()
                 .requestMatchers("/events").permitAll()
                 .requestMatchers("/events/{id}").permitAll()
                 .requestMatchers("/categories").permitAll()
@@ -67,18 +69,15 @@ public class SecurityConfig {
                 .requestMatchers("/tickets/{id}").permitAll()
                 .requestMatchers("/auth/**").permitAll()
                 .requestMatchers("/register").permitAll()
-                .requestMatchers("/home").permitAll()
-                // Protected endpoints
-                .requestMatchers("/events/create").authenticated()
-                .requestMatchers("/categories/create").authenticated()
-                .requestMatchers("/tickets/create").authenticated()
-                .requestMatchers("/api/events").hasRole("ADMIN")
-                .requestMatchers("/api/events/{id}").hasRole("ADMIN")
-                .requestMatchers("/api/categories").hasRole("ADMIN")
-                .requestMatchers("/api/categories/{id}").hasRole("ADMIN")
-                .requestMatchers("/api/tickets").hasRole("ADMIN")
-                .requestMatchers("/api/tickets/{id}").hasRole("ADMIN")
-                .anyRequest().authenticated()
+                .requestMatchers("/about").permitAll()
+                .requestMatchers("/contact").permitAll()
+                .requestMatchers("/privacy").permitAll()
+                .requestMatchers("/terms").permitAll()
+                .requestMatchers("/events/create").hasAnyRole("ADMIN", "ORGANIZER")
+                .requestMatchers("/categories/create").hasAnyRole("ADMIN", "ORGANIZER")
+                .requestMatchers("/tickets/create").hasAnyRole("ADMIN", "ORGANIZER")
+                .requestMatchers("/api/**").hasAnyRole("ADMIN", "ORGANIZER")
+                .anyRequest().permitAll()
             )
             .formLogin(form -> form
                 .loginPage("/auth/login")
@@ -89,6 +88,14 @@ public class SecurityConfig {
                 .failureUrl("/auth/login?error=true")
                 .permitAll()
             )
+            .exceptionHandling(exception -> exception
+                .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/auth/login"))
+                .accessDeniedHandler(new AccessDeniedHandlerImpl())
+            )
+            .csrf(csrf -> csrf
+                .ignoringRequestMatchers("/api/**")
+                .ignoringRequestMatchers("/auth/**")
+            )
             .logout(logout -> logout
                 .logoutUrl("/auth/logout")
                 .logoutSuccessUrl("/home")
@@ -97,7 +104,7 @@ public class SecurityConfig {
                 .permitAll()
             )
             .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .authenticationProvider(authenticationProvider());
 

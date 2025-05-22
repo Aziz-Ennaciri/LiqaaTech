@@ -1,19 +1,21 @@
 package com.LiqaaTech.Services.Interf;
 
-import com.LiqaaTech.Entities.Event;
+import com.LiqaaTech.DTOs.EventDTO;
+import com.LiqaaTech.DTOs.EventCreateDTO;
+import com.LiqaaTech.Security.Services.UserDetailsImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface EventService {
-    List<Event> getAllEvents();
-    Page<Event> getAllEvents(Pageable pageable);
-    Event getEventById(Long id);
-    Event createEvent(Event event);
-    Event updateEvent(Long id, Event event);
+    List<EventDTO> getAllEvents();
+    Page<EventDTO> getAllEvents(Pageable pageable);
+    EventDTO getEventById(Long id);
+    EventDTO createEvent(EventCreateDTO eventDTO, UserDetailsImpl currentUser);
+    EventDTO updateEvent(Long id, EventDTO eventDTO);
     void deleteEvent(Long id);
-    Page<Event> findAllEvents(Pageable pageable);
-    Page<Event> getEventsByCategory(Long categoryId, Pageable pageable);
-    List<Event> getUpcomingEvents();
-    Event save(Event event);
+    Page<EventDTO> findAllEvents(Pageable pageable);
+    Page<EventDTO> getEventsByCategory(Long categoryId, Pageable pageable);
+    List<EventDTO> getUpcomingEvents();
+    EventDTO save(EventDTO eventDTO);
 }

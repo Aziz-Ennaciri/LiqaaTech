@@ -20,16 +20,14 @@ public class EventMapper {
         Event event = new Event();
         event.setTitle(dto.getTitle());
         event.setDescription(dto.getDescription());
-        event.setDateTime(dto.getDateTime());
+        event.setStartDateTime(dto.getStartDateTime());
+        event.setEndDateTime(dto.getEndDateTime());
         event.setLocation(dto.getLocation());
         event.setCapacity(dto.getCapacity());
         event.setPrice(dto.getPrice());
         
         if (dto.getCategory() != null) {
             event.setCategory(new Category()); // This will be set by EventServiceImpl
-        }
-        if (dto.getOrganizer() != null) {
-            event.setOrganizer(new User()); // This will be set by EventServiceImpl
         }
         return event;
     }
@@ -42,35 +40,38 @@ public class EventMapper {
         event.setId(dto.getId());
         event.setTitle(dto.getTitle());
         event.setDescription(dto.getDescription());
-        event.setDateTime(dto.getDateTime());
+        event.setStartDateTime(dto.getStartDateTime());
         event.setLocation(dto.getLocation());
         event.setCapacity(dto.getCapacity());
         event.setPrice(dto.getPrice());
         if (dto.getCategory() != null) {
             event.setCategory(new Category()); // Will be set by EventServiceImpl
         }
+        if (dto.getOrganizer() != null) {
+            event.setOrganizer(new User()); // Will be set by EventServiceImpl
+        }
         return event;
     }
 
-    public EventDTO toDTO(Event event) {
-        if (event == null) {
+    public EventDTO toDTO(Event entity) {
+        if (entity == null) {
             return null;
         }
         EventDTO dto = new EventDTO();
-        dto.setId(event.getId());
-        dto.setTitle(event.getTitle());
-        dto.setDescription(event.getDescription());
-        dto.setDateTime(event.getDateTime());
-        dto.setLocation(event.getLocation());
-        dto.setCapacity(event.getCapacity());
-        dto.setPrice(event.getPrice());
-        if (event.getCategory() != null) {
-            dto.setCategory(event.getCategory().getId());
+        dto.setId(entity.getId());
+        dto.setTitle(entity.getTitle());
+        dto.setDescription(entity.getDescription());
+        dto.setStartDateTime(entity.getStartDateTime());
+        dto.setLocation(entity.getLocation());
+        dto.setCapacity(entity.getCapacity());
+        dto.setPrice(entity.getPrice());
+        if (entity.getCategory() != null) {
+            dto.setCategory(entity.getCategory().getId());
         }
-        if (event.getOrganizer() != null) {
-            dto.setOrganizer(event.getOrganizer().getId());
+        if (entity.getOrganizer() != null) {
+            dto.setOrganizer(entity.getOrganizer().getId());
         }
-        dto.setAvailableSpots(event.getAvailableSpots());
+        dto.setAvailableSpots(entity.getCapacity() - entity.getRegistrations().size());
         return dto;
     }
 
@@ -81,7 +82,7 @@ public class EventMapper {
         Event event = new Event();
         event.setTitle(dto.getTitle());
         event.setDescription(dto.getDescription());
-        event.setDateTime(dto.getDateTime());
+        event.setStartDateTime(dto.getStartDateTime());
         event.setLocation(dto.getLocation());
         event.setCapacity(dto.getMaxTickets());
         event.setPrice(dto.getPrice());
@@ -94,7 +95,7 @@ public class EventMapper {
         }
         event.setTitle(dto.getTitle());
         event.setDescription(dto.getDescription());
-        event.setDateTime(dto.getDateTime());
+        event.setStartDateTime(dto.getStartDateTime());
         event.setLocation(dto.getLocation());
         event.setCapacity(dto.getMaxTickets());
         event.setPrice(dto.getPrice());

@@ -31,7 +31,7 @@ public class TicketDTO {
             this.createdAt = ticket.getCreatedAt();
             this.updatedAt = ticket.getUpdatedAt();
             this.eventName = ticket.getEvent() != null ? ticket.getEvent().getTitle() : null;
-            this.eventDate = ticket.getEvent() != null ? ticket.getEvent().getDateTime() : null;
+            this.eventDate = ticket.getEvent() != null ? ticket.getEvent().getStartDateTime() : null;
         }
     }
 

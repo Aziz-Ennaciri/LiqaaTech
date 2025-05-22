@@ -19,13 +19,13 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional(readOnly = true)
     public List<Category> getAllCategories() {
-        return categoryRepository.findAll();
+        return categoryRepository.findAllWithEvents();
     }
 
     @Override
     @Transactional(readOnly = true)
     public Category getCategoryById(Long id) {
-        return categoryRepository.findById(id)
+        return categoryRepository.findByIdWithEvents(id)
                 .orElseThrow(() -> new NotFoundException("Category not found with id: " + id));
     }
 
@@ -44,6 +44,30 @@ public class CategoryServiceImpl implements CategoryService {
         }
         category.setDeleted(false);
         return categoryRepository.save(category);
+    }
+
+    @Override
+    @Transactional
+    public void ensureDefaultCategories() {
+        List<Category> categories = categoryRepository.findAll();
+        
+        if (categories.isEmpty()) {
+            // Create some default categories
+            Category general = new Category();
+            general.setName("General");
+            general.setDescription("General events and activities");
+            categoryRepository.save(general);
+            
+            Category sports = new Category();
+            sports.setName("Sports");
+            sports.setDescription("Sports and athletic events");
+            categoryRepository.save(sports);
+            
+            Category music = new Category();
+            music.setName("Music");
+            music.setDescription("Concerts and musical performances");
+            categoryRepository.save(music);
+        }
     }
 
     @Override

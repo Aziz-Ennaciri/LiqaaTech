@@ -34,7 +34,7 @@ public class HomeController {
         model.addAttribute("activeUsers", userService.getActiveUsersCount());
         model.addAttribute("totalRegistrations", registrationService.getTotalRegistrations());
         model.addAttribute("organizerCount", userService.getOrganizerCount());
-        return "index";
+        return "home";
     }
 
     @GetMapping("/home")
