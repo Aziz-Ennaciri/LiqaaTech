@@ -1,7 +1,7 @@
 package com.LiqaaTech.Mappers;
 
 import com.LiqaaTech.DTOs.TicketDTO;
-import com.LiqaaTech.Entities.Event;
+
 import com.LiqaaTech.Entities.Ticket;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +29,7 @@ public class TicketMapper {
                 .createdAt(ticket.getCreatedAt())
                 .updatedAt(ticket.getUpdatedAt())
                 .eventName(ticket.getEvent() != null ? ticket.getEvent().getTitle() : null)
-                .eventDate(ticket.getEvent() != null ? ticket.getEvent().getDateTime() : null)
+                .eventDate(ticket.getEvent() != null ? ticket.getEvent().getStartDateTime() : null)
                 .build();
     }
 

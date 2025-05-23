@@ -20,7 +20,7 @@ public class EventMapper {
         Event event = new Event();
         event.setTitle(dto.getTitle());
         event.setDescription(dto.getDescription());
-        event.setDateTime(dto.getDateTime());
+        event.setStartDateTime(dto.getStartDateTime());
         event.setLocation(dto.getLocation());
         event.setCapacity(dto.getCapacity());
         event.setPrice(dto.getPrice());
@@ -42,9 +42,9 @@ public class EventMapper {
         event.setId(dto.getId());
         event.setTitle(dto.getTitle());
         event.setDescription(dto.getDescription());
-        event.setDateTime(dto.getDateTime());
+        event.setStartDateTime(dto.getStartDateTime());
         event.setLocation(dto.getLocation());
-        event.setCapacity(dto.getCapacity());
+        event.setCapacity(dto.getMaxTickets());
         event.setPrice(dto.getPrice());
         if (dto.getCategory() != null) {
             event.setCategory(new Category()); // Will be set by EventServiceImpl
@@ -60,7 +60,7 @@ public class EventMapper {
         dto.setId(event.getId());
         dto.setTitle(event.getTitle());
         dto.setDescription(event.getDescription());
-        dto.setDateTime(event.getDateTime());
+        dto.setStartDateTime(event.getStartDateTime());
         dto.setLocation(event.getLocation());
         dto.setCapacity(event.getCapacity());
         dto.setPrice(event.getPrice());
@@ -81,9 +81,9 @@ public class EventMapper {
         Event event = new Event();
         event.setTitle(dto.getTitle());
         event.setDescription(dto.getDescription());
-        event.setDateTime(dto.getDateTime());
+        event.setStartDateTime(dto.getStartDateTime());
         event.setLocation(dto.getLocation());
-        event.setCapacity(dto.getMaxTickets());
+        event.setCapacity(dto.getCapacity());
         event.setPrice(dto.getPrice());
         return event;
     }
@@ -94,9 +94,9 @@ public class EventMapper {
         }
         event.setTitle(dto.getTitle());
         event.setDescription(dto.getDescription());
-        event.setDateTime(dto.getDateTime());
+        event.setStartDateTime(dto.getStartDateTime());
         event.setLocation(dto.getLocation());
-        event.setCapacity(dto.getMaxTickets());
+        event.setCapacity(dto.getCapacity());
         event.setPrice(dto.getPrice());
     }
 

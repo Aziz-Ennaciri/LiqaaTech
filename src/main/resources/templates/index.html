@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/main}">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/base}">
 <head>
     <title>Welcome to LiqaaTech</title>
 </head>
@@ -16,7 +16,7 @@
                     Your platform for creating and managing events
                 </p>
                 <div class="flex flex-col sm:flex-row justify-center gap-4">
-                    <a href="/events" class="btn-primary">
+                    <a th:href="@{/events}" class="btn-primary">
                         <span class="text-sm">Browse Events</span>
                     </a>
                     <a th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}" href="/events/create" class="btn-secondary">

@@ -1,13 +1,14 @@
 package com.LiqaaTech.ControllersAPIs;
 
+import com.LiqaaTech.DTOs.EventDTO;
 import com.LiqaaTech.DTOs.EventCreateDTO;
-import com.LiqaaTech.Entities.Event;
+import com.LiqaaTech.Security.Services.UserDetailsImpl;
 import com.LiqaaTech.Services.Interf.EventService;
-import com.LiqaaTech.Mappers.EventMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,33 +20,30 @@ public class EventController {
 
     @Autowired
     private EventService eventService;
-    
-    @Autowired
-    private EventMapper eventMapper;
 
     @GetMapping
     @Operation(summary = "Get all events")
-    public ResponseEntity<List<Event>> getAllEvents() {
+    public ResponseEntity<List<EventDTO>> getAllEvents() {
         return ResponseEntity.ok(eventService.getAllEvents());
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get event by ID")
-    public ResponseEntity<Event> getEventById(@PathVariable Long id) {
+    public ResponseEntity<EventDTO> getEventById(@PathVariable Long id) {
         return ResponseEntity.ok(eventService.getEventById(id));
     }
 
     @PostMapping
     @Operation(summary = "Create new event")
-    public ResponseEntity<Event> createEvent(@RequestBody EventCreateDTO eventDTO) {
-        Event event = eventMapper.toEntityFromCreateDTO(eventDTO);
-        return ResponseEntity.ok(eventService.createEvent(event));
+    public ResponseEntity<EventDTO> createEvent(@RequestBody EventCreateDTO eventDTO,
+                                                @AuthenticationPrincipal UserDetailsImpl currentUser) {
+        return ResponseEntity.ok(eventService.createEvent(eventDTO, currentUser));
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update event")
-    public ResponseEntity<Event> updateEvent(@PathVariable Long id, @RequestBody Event event) {
-        return ResponseEntity.ok(eventService.updateEvent(id, event));
+    public ResponseEntity<EventDTO> updateEvent(@PathVariable Long id, @RequestBody EventDTO eventDTO) {
+        return ResponseEntity.ok(eventService.updateEvent(id, eventDTO));
     }
 
     @DeleteMapping("/{id}")
@@ -54,4 +52,4 @@ public class EventController {
         eventService.deleteEvent(id);
         return ResponseEntity.ok().build();
     }
-} 
+}

@@ -3,21 +3,16 @@ package com.LiqaaTech.Entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
-import jakarta.persistence.Lob;
-import jakarta.persistence.Transient;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-
 
 @Entity
 @Table(name = "events")
@@ -40,54 +35,43 @@ public class Event extends EntityBase {
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
-    private Set<Registration> registrations = new HashSet<>();
+    private Set<Registration> registrations;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
-    private Set<Ticket> tickets = new HashSet<>();
+    private Set<Ticket> tickets;
 
-    @PrePersist
-    protected void onCreate() {
-        if (dateTime == null) {
-            dateTime = LocalDateTime.now().plusDays(1);
-        }
-        if (deleted == null) {
-            deleted = false;
-        }
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        if (dateTime != null && dateTime.isBefore(LocalDateTime.now())) {
-            dateTime = LocalDateTime.now().plusDays(1);
-        }
-    }
     @NotBlank
     @Size(max = 100)
+    @Column(nullable = false)
     private String title;
 
     @Size(max = 1000)
+    @Column(nullable = false)
     private String description;
-
-    @NotNull
-    @Future
-    @Column(name = "date_time", columnDefinition = "DATETIME")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm")
-    private LocalDateTime dateTime = LocalDateTime.now().plusDays(1).withMinute(0).withSecond(0); // Default to tomorrow at 00:00
-
-    @Column(name = "deleted")
-    private Boolean deleted = false;
-
-    public LocalDateTime getDateTime() {
-        if (dateTime == null || dateTime.isBefore(LocalDateTime.now())) {
-            return LocalDateTime.now().plusDays(1).withMinute(0).withSecond(0);
-        }
-        return dateTime;
-    }
 
     @NotBlank
     @Size(max = 200)
+    @Column(nullable = false)
     private String location;
+
+    @NotNull
+    @Min(1)
+    @Column(nullable = false)
+    private Integer capacity;
+
+    @NotNull
+    @DecimalMin("0.01")
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal price;
+
+    @NotNull
+    @Future
+    @Column(name = "start_date_time", columnDefinition = "DATETIME")
+    private LocalDateTime startDateTime;
+
+    @Column(name = "deleted")
+    private Boolean deleted;
 
     @DecimalMin("-90.0")
     @DecimalMax("90.0")
@@ -97,13 +81,46 @@ public class Event extends EntityBase {
     @DecimalMax("180.0")
     private Double longitude;
 
-    @NotNull
-    @Min(1)
-    private Integer capacity;
+    @PrePersist
+    protected void onCreate() {
+        if (startDateTime == null) {
+            startDateTime = LocalDateTime.now().plusDays(1);
+        }
+        if (deleted == null) {
+            deleted = false;
+        }
+        if (registrations == null) {
+            registrations = new HashSet<>();
+        }
+        if (tickets == null) {
+            tickets = new HashSet<>();
+        }
+    }
 
-    @NotNull
-    @DecimalMin("0.0")
-    private BigDecimal price;
+    @PreUpdate
+    protected void onUpdate() {
+        if (startDateTime != null && startDateTime.isBefore(LocalDateTime.now())) {
+            startDateTime = LocalDateTime.now().plusDays(1);
+        }
+    }
+
+    public LocalDateTime getStartDateTime() {
+        if (startDateTime == null || startDateTime.isBefore(LocalDateTime.now())) {
+            return LocalDateTime.now().plusDays(1).withMinute(0).withSecond(0);
+        }
+        return startDateTime;
+    }
+
+    public void setStartDateTime(LocalDateTime startDateTime) {
+        if (startDateTime == null) {
+            this.startDateTime = LocalDateTime.now().plusDays(1);
+        } else if (startDateTime.isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Event start date must be in the future");
+        }
+        this.startDateTime = startDateTime;
+    }
+
+
 
     @Lob
     @Column(name = "event_image", length = 1000000)
@@ -126,19 +143,6 @@ public class Event extends EntityBase {
 
     @Transient
     private Integer freeRegistrations;
-
-
-
-    public void setDateTime(LocalDateTime dateTime) {
-        if (dateTime == null) {
-            this.dateTime = LocalDateTime.now().plusDays(1);
-        } else if (dateTime.isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("Event date must be in the future");
-        }
-        this.dateTime = dateTime;
-    }
-
-
 
     public int getAvailableSpots() {
         return capacity - registrations.size();

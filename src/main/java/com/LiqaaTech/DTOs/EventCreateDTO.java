@@ -17,9 +17,9 @@ public class EventCreateDTO {
     @NotBlank(message = "Description is required")
     private String description;
 
-    @NotNull(message = "Date and time is required")
+    @NotNull(message = "Start date and time is required")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
-    private LocalDateTime dateTime;
+    private LocalDateTime startDateTime;
 
     @NotBlank(message = "Location is required")
     private String location;
@@ -33,6 +33,5 @@ public class EventCreateDTO {
 
     private Long category;
 
-    @NotNull(message = "Organizer is required")
     private Long organizer;
 }

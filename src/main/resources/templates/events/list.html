@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/main}">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/base}">
 <head>
     <title>Events - LiqaaTech</title>
 </head>
 <body>
-<div layout:fragment="content">
-    <!-- Search and Filter Section -->
-    <div class="bg-white shadow-lg rounded-lg">
-        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-            <form th:action="@{/events}" method="get" class="space-y-4">
+    <div layout:fragment="content">
+        <!-- Search and Filter Section -->
+        <div class="bg-white shadow-lg rounded-lg">
+            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                <form th:action="@{/events}" method="get" class="space-y-4">
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     <!-- Search -->
                     <div>
@@ -67,7 +67,7 @@
         <!-- Results Count -->
         <div class="mb-6">
             <p class="text-gray-600">
-                Showing <span class="font-semibold" th:text="${events.totalElements}">0</span> events
+                Showing <span class="font-semibold" th:text="${#lists.size(events)}">0</span> events
                 <span th:if="${param.search != null or param.category != null or param.date != null or param.price != null}">
                     matching your filters
                 </span>
@@ -81,7 +81,7 @@
                     <div class="flex justify-between items-start mb-4">
                         <div class="flex items-center text-sm text-gray-500">
                             <i class="far fa-calendar-alt mr-2"></i>
-                            <span th:text="${#temporals.format(event.dateTime, 'MMM dd, yyyy HH:mm')}"></span>
+                            <span th:text="${#temporals.format(event.startDateTime, 'MMM dd, yyyy HH:mm')}"></span>
                         </div>
                         <div class="bg-accent text-white px-3 py-1 rounded-full text-sm">
                             <span th:text="${event.availableSpots} + ' spots left'"></span>
@@ -94,7 +94,7 @@
                         <span th:text="${event.location}"></span>
                     </div>
                     <div class="flex justify-between items-center">
-                        <span class="text-2xl font-bold text-primary" th:text="${'$' + event.ticketPrice}"></span>
+                        <span class="text-2xl font-bold text-primary" th:text="${'$' + event.price}"></span>
                         <a th:href="@{/events/{id}(id=${event.id})}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                             View Details
                         </a>
