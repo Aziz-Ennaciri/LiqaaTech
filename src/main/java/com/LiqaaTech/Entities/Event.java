@@ -66,12 +66,13 @@ public class Event extends EntityBase {
     private BigDecimal price;
 
     @NotNull
-    @Future
-    @Column(name = "start_date_time", columnDefinition = "DATETIME")
+    @Column(name = "date_time", columnDefinition = "DATETIME")
     private LocalDateTime startDateTime;
 
     @Column(name = "deleted")
     private Boolean deleted;
+
+
 
     @DecimalMin("-90.0")
     @DecimalMax("90.0")
@@ -120,11 +121,6 @@ public class Event extends EntityBase {
         this.startDateTime = startDateTime;
     }
 
-
-
-    @Lob
-    @Column(name = "event_image", length = 1000000)
-    private byte[] eventImage;
 
     @Transient
     private String eventImageBase64;

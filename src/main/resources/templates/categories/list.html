@@ -1,29 +1,30 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" 
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       layout:decorate="~{layout/main}">
 <head>
-    <title>Categories - LiqaaTech</title>
+    <title layout:title-pattern="$CONTENT_TITLE - LiqaaTech">Categories - LiqaaTech</title>
 </head>
-<body>
+<body class="font-poppins">
     <div layout:fragment="content">
-        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div class="text-center mb-8">
-                <h1 class="text-2xl sm:text-3xl font-semibold text-gray-900 dark:text-white mb-4">
+                <h1 class="text-4xl font-extrabold text-gray-900 mb-6">
                     Event Categories
                 </h1>
-                <p class="text-gray-600 dark:text-gray-300 text-sm">
+                <p class="text-gray-600 text-lg mb-8">
                     Explore events by category
                 </p>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div th:each="category : ${categories}" class="bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-shadow p-6">
+                <div th:each="category : ${categories}" class="bg-white rounded-3xl shadow-lg hover:shadow-xl transition-shadow duration-200 p-6">
                     <div class="text-center">
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-white" th:text="${category.name}">Category Name</h3>
-                        <p class="mt-2 text-sm text-gray-600 dark:text-gray-300" th:text="${category.events.size() + ' events'}">0 events</p>
+                        <h3 class="text-2xl font-bold text-gray-900" th:text="${category.name}">Category Name</h3>
+                        <p class="mt-2 text-gray-600">Browse events in this category</p>
                         <a th:href="@{/categories/{id}(id=${category.id})}" 
-                           class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+                           class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                             View Events
                         </a>
                     </div>

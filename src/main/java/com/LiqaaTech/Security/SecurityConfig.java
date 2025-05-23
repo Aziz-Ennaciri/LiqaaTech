@@ -61,6 +61,8 @@ public class SecurityConfig {
                 .requestMatchers("/").permitAll()
                 .requestMatchers("/events").permitAll()
                 .requestMatchers("/events/{id}").permitAll()
+                .requestMatchers("/browse-events").permitAll()
+                .requestMatchers("/browse-events/{id}").permitAll()
                 .requestMatchers("/categories").permitAll()
                 .requestMatchers("/categories/{id}").permitAll()
                 .requestMatchers("/tickets").permitAll()

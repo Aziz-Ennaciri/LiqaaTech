@@ -1,6 +1,6 @@
 package com.LiqaaTech.ControllersAPIs;
 
-import com.LiqaaTech.Entities.Category;
+import com.LiqaaTech.DTOs.CategoryDTO;
 import com.LiqaaTech.Services.Interf.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -11,6 +11,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,11 +33,11 @@ public class CategoryController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Successfully retrieved all categories",
                     content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = Category.class))),
+                    schema = @Schema(implementation = CategoryDTO.class))),
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
         @ApiResponse(responseCode = "403", description = "Forbidden")
     })
-    public ResponseEntity<List<Category>> getAllCategories() {
+    public ResponseEntity<List<CategoryDTO>> getAllCategories() {
         return ResponseEntity.ok(categoryService.getAllCategories());
     }
 
@@ -43,11 +45,11 @@ public class CategoryController {
     @Operation(summary = "Get category by ID", description = "Retrieves a specific category by its ID")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Category found",
-                    content = @Content(schema = @Schema(implementation = Category.class))),
+                    content = @Content(schema = @Schema(implementation = CategoryDTO.class))),
         @ApiResponse(responseCode = "404", description = "Category not found",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
-    public ResponseEntity<Category> getCategoryById(
+    public ResponseEntity<CategoryDTO> getCategoryById(
             @Parameter(description = "ID of the category to retrieve")
             @PathVariable Long id) {
         return ResponseEntity.ok(categoryService.getCategoryById(id));
@@ -57,35 +59,35 @@ public class CategoryController {
     @Operation(summary = "Create new category", description = "Creates a new event category")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Category created successfully",
-                    content = @Content(schema = @Schema(implementation = Category.class))),
+                    content = @Content(schema = @Schema(implementation = CategoryDTO.class))),
         @ApiResponse(responseCode = "400", description = "Invalid input",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Category> createCategory(
+    public ResponseEntity<CategoryDTO> createCategory(
             @Parameter(description = "Category data to create")
-            @Valid @RequestBody Category category) {
+            @Valid @RequestBody CategoryDTO categoryDTO) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(categoryService.createCategory(category));
+                .body(categoryService.createCategory(categoryDTO));
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update category", description = "Updates an existing category")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Category updated successfully",
-                    content = @Content(schema = @Schema(implementation = Category.class))),
+                    content = @Content(schema = @Schema(implementation = CategoryDTO.class))),
         @ApiResponse(responseCode = "404", description = "Category not found",
                     content = @Content(schema = @Schema(implementation = String.class))),
         @ApiResponse(responseCode = "400", description = "Invalid input",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Category> updateCategory(
+    public ResponseEntity<CategoryDTO> updateCategory(
             @Parameter(description = "ID of the category to update")
             @PathVariable Long id,
             @Parameter(description = "Updated category data")
-            @Valid @RequestBody Category category) {
-        return ResponseEntity.ok(categoryService.updateCategory(id, category));
+            @Valid @RequestBody CategoryDTO categoryDTO) {
+        return ResponseEntity.ok(categoryService.updateCategory(id, categoryDTO));
     }
 
     @DeleteMapping("/{id}")
@@ -103,15 +105,27 @@ public class CategoryController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/page")
+    @Operation(summary = "Get paginated categories", description = "Retrieves a paginated list of categories")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved paginated categories",
+                    content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = Page.class))),
+        @ApiResponse(responseCode = "401", description = "Unauthorized"),
+        @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
+    public ResponseEntity<Page<CategoryDTO>> getPaginatedCategories(Pageable pageable) {
+        return ResponseEntity.ok(categoryService.findAll(pageable));
+    }
     @GetMapping("/by-name")
     @Operation(summary = "Get category by name", description = "Retrieves a category by its name")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Category found",
-                    content = @Content(schema = @Schema(implementation = Category.class))),
+                    content = @Content(schema = @Schema(implementation = CategoryDTO.class))),
         @ApiResponse(responseCode = "404", description = "Category not found",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
-    public ResponseEntity<Category> getCategoryByName(
+    public ResponseEntity<CategoryDTO> getCategoryByName(
             @Parameter(description = "Name of the category to retrieve")
             @RequestParam String name) {
         return ResponseEntity.ok(categoryService.getCategoryByName(name));

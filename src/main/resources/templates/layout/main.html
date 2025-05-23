@@ -23,7 +23,7 @@
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <a href="/" class="text-primary text-2xl font-bold tracking-tight">LiqaaTech</a>
+                        <a href="/" class="text-gray-900 text-2xl font-bold tracking-tight">LiqaaTech</a>
                     </div>
                     <div class="hidden md:block">
                         <div class="ml-10 flex items-baseline space-x-6">
@@ -38,10 +38,14 @@
                     <div class="hidden md:block">
                         <div class="ml-4 flex items-center md:ml-6">
                             <div th:if="${#authorization.expression('isAuthenticated()')}" class="flex items-center space-x-4">
-                                <span class="text-gray-700 font-medium" th:text="${#authentication.name}"></span>
-                                <form th:action="@{/auth/logout}" method="post" class="inline">
-                                    <button type="submit" class="btn-secondary">Logout</button>
-                                </form>
+                                <div class="flex items-center space-x-4">
+                                    <a href="/" class="flex items-center space-x-2 text-gray-700 font-medium hover:text-gray-900">
+                                        <span th:text="${#authentication.principal.username}">Username</span>
+                                    </a>
+                                    <form th:action="@{/auth/logout}" method="post" class="inline">
+                                        <button type="submit" class="btn-secondary">Logout</button>
+                                    </form>
+                                </div>
                             </div>
                             <div th:unless="${#authorization.expression('isAuthenticated()')}" class="flex items-center space-x-4">
                                 <a th:href="@{/auth/login}" class="btn-secondary">Login</a>
@@ -119,20 +123,20 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-50 text-gray-600 mt-8">
+    <footer class="bg-white border-t border-gray-200 text-gray-600 mt-8">
         <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center">
+            <div class="flex flex-col sm:flex-row justify-between items-center">
                 <div>
                     <p class="text-sm">&copy; 2025 LiqaaTech. All rights reserved.</p>
                 </div>
-                <div class="flex space-x-6">
-                    <a href="#" class="text-gray-400 hover:text-gray-500">
+                <div class="flex space-x-6 mt-4 sm:mt-0">
+                    <a href="#" class="text-gray-400 hover:text-gray-500 transition-colors duration-200">
                         <i class="fab fa-facebook"></i>
                     </a>
-                    <a href="#" class="text-gray-400 hover:text-gray-500">
+                    <a href="#" class="text-gray-400 hover:text-gray-500 transition-colors duration-200">
                         <i class="fab fa-twitter"></i>
                     </a>
-                    <a href="#" class="text-gray-400 hover:text-gray-500">
+                    <a href="#" class="text-gray-400 hover:text-gray-500 transition-colors duration-200">
                         <i class="fab fa-instagram"></i>
                     </a>
                 </div>
@@ -148,10 +152,6 @@
                 extend: {
                     fontFamily: {
                         sans: ['Inter', 'Poppins', 'Roboto', 'sans-serif'],
-                    },
-                    colors: {
-                        primary: '#7c3aed', // vibrant purple
-                        accent: '#f59e42', // orange accent
                     },
                 },
             },

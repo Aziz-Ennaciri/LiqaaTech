@@ -72,7 +72,6 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventDTO createEvent(EventCreateDTO eventDTO, UserDetailsImpl currentUser) {
-        // Validate required fields
         if (eventDTO.getTitle() == null || eventDTO.getTitle().trim().isEmpty()) {
             throw new IllegalArgumentException("Event title is required");
         }
@@ -85,11 +84,7 @@ public class EventServiceImpl implements EventService {
         if (eventDTO.getCategory() == null) {
             throw new IllegalArgumentException("Event category is required");
         }
-        if (eventDTO.getStartDateTime().isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("Event start date must be in the future");
-        }
 
-        // Create entity from DTO
         Event event = new Event();
         event.setTitle(eventDTO.getTitle());
         event.setDescription(eventDTO.getDescription());
@@ -98,28 +93,18 @@ public class EventServiceImpl implements EventService {
         event.setPrice(eventDTO.getPrice());
         event.setLocation(eventDTO.getLocation());
 
-        // Validate that date is in the future
-        if (eventDTO.getStartDateTime().isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("Event date must be in the future");
-        }
-
-        // Validate user authentication and role
         if (currentUser == null) {
             throw new SecurityException("User not authenticated");
         }
 
-        // Set category and organizer references
         event.setCategory(categoryRepository.findById(eventDTO.getCategory())
                 .orElseThrow(() -> new NotFoundException("Category not found")));
 
-        // Get the User entity from the UserDetailsImpl
         User user = userRepository.findById(currentUser.getId())
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
-        // Set the User as organizer
         event.setOrganizer(user);
 
-        // Save the event
         Event savedEvent = eventRepository.save(event);
         return eventMapper.toDTO(savedEvent);
     }
@@ -143,7 +128,6 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional(readOnly = true)
     public Page<EventDTO> findAllEvents(Pageable pageable) {
-        // Use a custom query to fetch events with their registrations
         Page<Event> events = eventRepository.findAllWithRegistrations(LocalDateTime.now(), pageable);
         return events.map(eventMapper::toDTO);
     }
@@ -165,27 +149,41 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventDTO save(EventDTO eventDTO) {
-        Event event = new Event();
-        event.setTitle(eventDTO.getTitle());
-        event.setDescription(eventDTO.getDescription());
-        event.setStartDateTime(eventDTO.getStartDateTime());
-        event.setCapacity(eventDTO.getCapacity());
-        event.setPrice(eventDTO.getPrice());
-        event.setLocation(eventDTO.getLocation());
-
-        if (eventDTO.getCategory() != null) {
-            event.setCategory(categoryRepository.findById(eventDTO.getCategory())
-                    .orElseThrow(() -> new NotFoundException("Category not found")));
-        }
-        if (eventDTO.getOrganizer() != null) {
-            event.setOrganizer(userRepository.findById(eventDTO.getOrganizer())
-                    .orElseThrow(() -> new NotFoundException("Organizer not found")));
-        }
-
-        Event savedEvent = eventRepository.save(event);
-        return toDTO(savedEvent);
+    public List<EventDTO> getUpcomingEvents(Long userId) {
+        return eventRepository.findUpcomingEventsByUser(userId, LocalDateTime.now())
+                .stream()
+                .map(eventMapper::toDTO)
+                .collect(Collectors.toList());
     }
+
+    @Override
+    public List<EventDTO> getUserRegistrations(Long userId) {
+        return eventRepository.findEventsByRegistration(userId)
+                .stream()
+                .map(eventMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<EventDTO> getCreatedEvents(Long userId) {
+        return eventRepository.findByOrganizerId(userId)
+                .stream()
+                .map(eventMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public EventDTO save(EventDTO eventDTO) {
+        Event event = eventMapper.toEntity(eventDTO);
+        event.setOrganizer(userRepository.findById(eventDTO.getOrganizer())
+                .orElseThrow(() -> new NotFoundException("User not found")));
+        event.setCategory(categoryRepository.findById(eventDTO.getCategory())
+                .orElseThrow(() -> new NotFoundException("Category not found")));
+        Event savedEvent = eventRepository.save(event);
+        return eventMapper.toDTO(savedEvent);
+    }
+
+
 
     private EventDTO toDTO(Event event) {
         EventDTO dto = new EventDTO();

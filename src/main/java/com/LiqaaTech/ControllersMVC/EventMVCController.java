@@ -5,6 +5,7 @@ import com.LiqaaTech.DTOs.EventCreateDTO;
 import com.LiqaaTech.Security.Services.UserDetailsImpl;
 import com.LiqaaTech.Services.Interf.EventService;
 import com.LiqaaTech.Services.Interf.CategoryService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,9 +21,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.time.LocalDateTime;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Controller
-@RequestMapping("/events")
+@RequestMapping({"/events"})
 public class EventMVCController {
 
     private final EventService eventService;
@@ -38,21 +40,33 @@ public class EventMVCController {
     public String showEvents(Model model, @RequestParam(required = false, defaultValue = "0") int page,
                              @RequestParam(required = false, defaultValue = "10") int size,
                              @RequestParam(required = false, defaultValue = "startDateTime") String sortField,
-                             @RequestParam(required = false, defaultValue = "asc") String sortDir) {
+                             @RequestParam(required = false, defaultValue = "asc") String sortDir,
+                             @RequestParam(required = false) String search,
+                             @RequestParam(required = false) String category,
+                             @RequestParam(required = false) String date,
+                             @RequestParam(required = false) String price,
+                             HttpServletRequest request) {
+        model.addAttribute("search", search);
+        model.addAttribute("category", category);
+        model.addAttribute("date", date);
+        model.addAttribute("price", price);
+        model.addAttribute("categories", categoryService.getAllCategories());
+        String currentUrl = request.getRequestURI();
+        model.addAttribute("currentUrl", currentUrl);
         Page<EventDTO> eventsPage = eventService.getAllEvents(PageRequest.of(page, size,
                 Sort.by(Sort.Direction.fromString(sortDir), sortField)));
-
-        // Add both the Page object and its content to the model
         model.addAttribute("eventsPage", eventsPage);
         model.addAttribute("events", eventsPage.getContent());
-
-        // Add pagination info
-        model.addAttribute("currentPage", page);
+        model.addAttribute("currentPage", eventsPage.getNumber());
         model.addAttribute("totalPages", eventsPage.getTotalPages());
         model.addAttribute("totalItems", eventsPage.getTotalElements());
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDir", sortDir);
         model.addAttribute("reverseSortDir", sortDir.equals("asc") ? "desc" : "asc");
+        model.addAttribute("search", search);
+        model.addAttribute("category", category);
+        model.addAttribute("date", date);
+        model.addAttribute("price", price);
         return "events/list";
     }
 
@@ -74,13 +88,14 @@ public class EventMVCController {
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public String createEvent(@Valid EventCreateDTO eventDTO, BindingResult result,
                               RedirectAttributes redirectAttributes,
-                              @AuthenticationPrincipal UserDetailsImpl currentUser) {
+                              @AuthenticationPrincipal UserDetailsImpl currentUser,
+                              HttpServletRequest request) {
         if (result.hasErrors()) {
-            // Add all field errors to the model
             for (ObjectError error : result.getAllErrors()) {
                 redirectAttributes.addFlashAttribute("error", error.getDefaultMessage());
             }
             redirectAttributes.addFlashAttribute("eventDTO", eventDTO);
+            redirectAttributes.addFlashAttribute("categories", categoryService.getAllCategories());
             return "redirect:/events/create";
         }
 

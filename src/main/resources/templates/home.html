@@ -37,22 +37,16 @@
                 <p class="mt-3 max-w-2xl mx-auto text-xl text-gray-500">Check out our most popular upcoming events</p>
             </div>
             <div class="mt-12 grid gap-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                <div th:each="event : ${featuredEvents}" class="card group p-0 hover:scale-105 transition-transform duration-200">
-                    <div class="relative">
-                        <img th:src="${event.imageUrl}" th:alt="${event.title}" class="w-full h-56 object-cover rounded-t-3xl">
-                        <div class="absolute top-4 right-4 bg-accent text-white px-3 py-1 rounded-full text-sm shadow">
-                            <span th:text="${event.availableSpots} + ' spots left'"></span>
-                        </div>
+                <div th:each="event : ${featuredEvents}" class="card group p-6 hover:scale-105 transition-transform duration-200 bg-white rounded-3xl shadow-lg">
+                    <div class="flex items-center text-sm text-gray-500 mb-2">
+                        <i class="far fa-calendar-alt mr-2"></i>
+                        <span th:text="${#temporals.format(event.startDateTime, 'MMM dd, yyyy')}"></span>
                     </div>
-                    <div class="p-6">
-                        <div class="flex items-center text-sm text-gray-500 mb-2">
-                            <i class="far fa-calendar-alt mr-2"></i>
-                            <span th:text="${#temporals.format(event.startDateTime, 'MMM dd, yyyy')}"></span>
-                        </div>
-                        <h3 class="text-2xl font-bold text-gray-900 mb-2" th:text="${event.title}"></h3>
-                        <p class="text-gray-600 mb-4" th:text="${#strings.abbreviate(event.description, 100)}"></p>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2" th:text="${event.title}"></h3>
+                    <p class="text-gray-600 mb-4" th:text="${#strings.abbreviate(event.description, 100)}"></p>
+                    <div class="flex justify-between items-center">
                         <div class="flex justify-between items-center">
-                            <span class="text-2xl font-bold text-primary" th:text="${'$' + event.ticketPrice}"></span>
+                            <span class="text-2xl font-bold text-primary" th:text="${'$' + event.price}"></span>
                             <a th:href="@{/events/{id}(id=${event.id})}" class="btn-primary btn-sm">View Details</a>
                         </div>
                     </div>

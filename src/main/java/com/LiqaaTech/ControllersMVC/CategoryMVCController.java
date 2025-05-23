@@ -1,6 +1,6 @@
 package com.LiqaaTech.ControllersMVC;
 
-import com.LiqaaTech.Entities.Category;
+import com.LiqaaTech.DTOs.CategoryDTO;
 import com.LiqaaTech.Services.Interf.CategoryService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,13 +31,13 @@ public class CategoryMVCController {
     @GetMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
     public String showCreateForm(Model model) {
-        model.addAttribute("category", new Category());
+        model.addAttribute("category", new CategoryDTO());
         return "category/create";
     }
 
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
-    public String createCategory(@Valid @ModelAttribute("category") Category category,
+    public String createCategory(@Valid @ModelAttribute("category") CategoryDTO categoryDTO,
                                BindingResult result,
                                RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
@@ -45,7 +45,7 @@ public class CategoryMVCController {
         }
 
         try {
-            categoryService.createCategory(category);
+            categoryService.createCategory(categoryDTO);
             redirectAttributes.addFlashAttribute("success", "Category created successfully!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
@@ -57,14 +57,14 @@ public class CategoryMVCController {
 
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
-        Category category = categoryService.getCategoryById(id);
+        CategoryDTO category = categoryService.getCategoryById(id);
         model.addAttribute("category", category);
         return "category/edit";
     }
 
     @PostMapping("/edit/{id}")
     public String updateCategory(@PathVariable Long id,
-                               @Valid @ModelAttribute("category") Category category,
+                               @Valid @ModelAttribute("category") CategoryDTO categoryDTO,
                                BindingResult result,
                                RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
@@ -72,7 +72,7 @@ public class CategoryMVCController {
         }
 
         try {
-            categoryService.updateCategory(id, category);
+            categoryService.updateCategory(id, categoryDTO);
             redirectAttributes.addFlashAttribute("success", "Category updated successfully!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
@@ -92,4 +92,4 @@ public class CategoryMVCController {
         }
         return "redirect:/categories";
     }
-} 
+}

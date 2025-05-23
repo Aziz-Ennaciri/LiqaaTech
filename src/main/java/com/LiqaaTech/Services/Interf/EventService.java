@@ -17,5 +17,8 @@ public interface EventService {
     Page<EventDTO> findAllEvents(Pageable pageable);
     Page<EventDTO> getEventsByCategory(Long categoryId, Pageable pageable);
     List<EventDTO> getUpcomingEvents();
+    List<EventDTO> getUpcomingEvents(Long userId);
+    List<EventDTO> getUserRegistrations(Long userId);
+    List<EventDTO> getCreatedEvents(Long userId);
     EventDTO save(EventDTO eventDTO);
 }

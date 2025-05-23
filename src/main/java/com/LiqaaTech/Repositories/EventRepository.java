@@ -28,4 +28,12 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     @Query("SELECT e FROM Event e LEFT JOIN FETCH e.registrations r LEFT JOIN FETCH e.tickets t WHERE e.startDateTime > :now ORDER BY e.startDateTime ASC")
     Page<Event> findAllWithRegistrations(@Param("now") LocalDateTime now, Pageable pageable);
+
+    @Query("SELECT e FROM Event e WHERE e.startDateTime > :now AND e.organizer.id = :userId ORDER BY e.startDateTime ASC")
+    List<Event> findUpcomingEventsByUser(@Param("userId") Long userId, @Param("now") LocalDateTime now);
+
+    @Query("SELECT e FROM Event e JOIN e.registrations r WHERE r.user.id = :userId")
+    List<Event> findEventsByRegistration(@Param("userId") Long userId);
+
+    List<Event> findByOrganizerId(Long organizerId);
 }
