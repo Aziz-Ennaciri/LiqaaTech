@@ -17,7 +17,7 @@
                 <p class="text-xl md:text-2xl text-white/90 mb-8 font-light tracking-wide">Your platform for creating and managing events</p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
                     <a href="/events" class="btn-primary text-lg px-8 py-3 shadow-lg">Browse Events</a>
-                    <a href="/events/create" class="btn-secondary text-lg px-8 py-3 shadow-lg">Create Event</a>
+                    <a th:href="@{/events/create}" class="btn-secondary text-lg px-8 py-3 shadow-lg" th:if="${#authorization.expression('isAuthenticated() and (hasRole(''ROLE_ADMIN'') or hasRole(''ROLE_ORGANISER''))')}" th:text="${'Create Event'}">Create Event</a>
                 </div>
             </div>
         </div>
@@ -87,7 +87,7 @@
                 <span class="block text-accent">Start organizing today.</span>
             </h2>
             <div class="flex gap-4">
-                <a href="/events/create" class="btn-primary text-lg px-8 py-3">Create Event</a>
+                <a th:href="@{/events/create}" class="btn-primary text-lg px-8 py-3" th:if="${#authorization.expression('isAuthenticated() and (hasRole(''ROLE_ADMIN'') or hasRole(''ROLE_ORGANISER''))')}" th:text="${'Create Event'}">Create Event</a>
                 <a href="/events" class="btn-secondary text-lg px-8 py-3">Browse Events</a>
             </div>
         </div>

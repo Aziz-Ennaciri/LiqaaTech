@@ -71,7 +71,7 @@ public class SecurityConfig {
                 .requestMatchers("/register").permitAll()
                 .requestMatchers("/home").permitAll()
                 // Protected endpoints
-                .requestMatchers("/events/create").authenticated()
+                .requestMatchers("/events/create").hasAnyRole("ADMIN", "ORGANISER")
                 .requestMatchers("/categories/create").authenticated()
                 .requestMatchers("/tickets/create").authenticated()
                 .requestMatchers("/api/events").hasRole("ADMIN")

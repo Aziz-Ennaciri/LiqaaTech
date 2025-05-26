@@ -16,7 +16,7 @@
                         Event Management
                     </h1>
                 </div>
-                <div class="mt-4 flex md:mt-0 md:ml-4" sec:authorize="hasRole('ADMIN')">
+                <div class="mt-4 flex md:mt-0 md:ml-4" sec:authorize="hasAnyRole('ADMIN', 'ORGANISER')">
                     <a th:href="@{/events/create}" class="ml-3 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                         <i class="fas fa-calendar-plus mr-2"></i>
                         Create Event
@@ -135,7 +135,7 @@
                             <a th:href="@{'/events/' + ${event.id}}" class="text-indigo-600 hover:text-indigo-900 mr-3">
                                 <i class="fas fa-eye"></i>
                             </a>
-                            <span sec:authorize="hasRole('ADMIN')">
+                            <span sec:authorize="hasAnyRole('ADMIN', 'ORGANISER')">
                                 <button class="text-indigo-600 hover:text-indigo-900 mr-3" th:data-event-id="${event.id}" onclick="editEvent(this.getAttribute('data-event-id'))">
                                     <i class="fas fa-edit"></i>
                                 </button>
@@ -195,7 +195,7 @@
     </div>
 
     <!-- Create/Edit Event Modal -->
-    <div id="eventModal" class="fixed z-10 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true" sec:authorize="hasRole('ADMIN')">
+    <div id="eventModal" class="fixed z-10 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true" sec:authorize="hasAnyRole('ADMIN', 'ORGANISER')">
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>

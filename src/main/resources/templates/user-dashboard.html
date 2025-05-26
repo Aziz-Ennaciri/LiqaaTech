@@ -42,6 +42,21 @@
     </div>
 
     <!-- My Registrations -->
+    <!-- Create Event Button (for admins and organisers) -->
+    <div class="mt-8" th:if="${#authorization.expression('isAuthenticated() and (hasRole(''ROLE_ADMIN'') or hasRole(''ROLE_ORGANISER''))')}">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-white shadow rounded-lg">
+                <div class="p-6">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-lg font-medium text-gray-900">Create New Event</h2>
+                        <a href="/events/create" class="btn-primary">Create Event</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Registrations -->
     <div class="mt-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white shadow rounded-lg">
